@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import FormContainer from "../../components/AccountForm";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import ErrorMessage from "../../components/ErrorMessage";
 
 export default function Register(){
     const [values, setValues] = useState({
@@ -16,7 +15,7 @@ export default function Register(){
     
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        axios.post('http://localhost:3001/register', values)
+        axios.post('http://localhost:3000/register', values)
         .then(res => {
             if(res.data.Status === "Success"){
                 alert("Account created succesfully!")
