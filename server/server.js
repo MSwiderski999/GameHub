@@ -53,7 +53,19 @@ app.post('/login', (req, res) => {
 })
 
 app.post('/register', (req, res) => {
-    const sql = "INSERT INTO accounts (`username`, `email`, `password`)VALUES(?)"
+    const findEmailSql = "SELECT * FROM accounts WHERE email = ?"
+    const findUsernameSql = "SELECT * FROM accounts WHERE username = ?"
+    const registerSql = "INSERT INTO accounts (`username`, `email`, `password`)VALUES(?)"
+
+    db.query(findEmailSql, req.body.email, (err, data) => {
+        if (err) return res.json({Message: err.message})
+        if (data.length > 0) return res.json({Message: "Email already in use"})
+    })
+    db.query(findUsernameSql, req.body.username, (err, data) => {
+        if (err) return res.json({Message: err.message})
+        if (data.length > 0) return res.json({Message: "Username already in use"})
+    })
+
     bcrypt.hash(req.body.password.toString(), salt, (err, hash) => {
         if (err) return res.json({Message: err.message})
         const values = [
@@ -61,7 +73,8 @@ app.post('/register', (req, res) => {
             req.body.email,
             hash
         ]
-        db.query(sql, [values], (err, result) => {
+
+        db.query(registerSql, [values], (err, result) => {
             if (err) return res.json({Message: err.message})
             return res.json({Status: "Success"})
         })

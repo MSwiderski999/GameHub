@@ -7,6 +7,7 @@ import Logout from './pages/Logout'
 import Navbar from './components/Navbar'
 
 function App() {
+
   return (
     <BrowserRouter>
       <Navbar loggedIn={true}></Navbar>

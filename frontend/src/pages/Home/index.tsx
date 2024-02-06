@@ -1,4 +1,4 @@
-import React, { ReactElement } from "react";
+import { ReactElement } from "react";
 
 interface HomeProps{
     children?: ReactElement
@@ -6,6 +6,6 @@ interface HomeProps{
 
 export default function Home(props: HomeProps){
     return (
-        <h1>Home</h1>
+        <><h1>Home</h1>{props.children}</>
     )
 }

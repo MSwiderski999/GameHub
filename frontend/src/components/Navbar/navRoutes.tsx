@@ -1,10 +1,6 @@
 import { Link } from "react-router-dom"
 
-interface NavRoutesProps{
-    loggedIn: boolean
-}
-
-export default function NavRoutes(authStatus : NavRoutesProps){
+export default function NavRoutes(authStatus : boolean){
     if(authStatus){
         return (
             <div className="nav-list">
