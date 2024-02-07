@@ -5,12 +5,12 @@ import Home from './pages/Home'
 import Register from './pages/Register'
 import Logout from './pages/Logout'
 import Navbar from './components/Navbar'
+import { auth } from './helpers/userAuth'
 
 function App() {
-
   return (
     <BrowserRouter>
-      <Navbar loggedIn={true}></Navbar>
+      <Navbar loggedIn={auth}></Navbar>
       <Routes>
         <Route path="/login" element={<Login/>}></Route>
         <Route path="/" element={<Home/>}></Route>
