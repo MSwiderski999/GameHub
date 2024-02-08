@@ -37,9 +37,6 @@ app.post('/login', (req, res) => {
                     return res.json({Message: err.message})
                 }
                 if (response){
-                    const username = data[0].username
-                    const token = jwt.sign({username}, "jwt-key", {expiresIn: '10d'})
-                    res.cookie('token', token)
                     return res.json({Status: "Success"})
                 }
                 else {
@@ -81,6 +78,25 @@ app.post('/register', (req, res) => {
     })
 })
 
+app.post('/change-name', (req, res) => {
+    const sql = "UPDATE accounts SET username = ? WHERE username = ?"
+    const oldUsername = req.body.oldUsername
+    const newUsername = req.body.newUsername
+    db.query(sql, [oldUsername, newUsername], (err) => {
+        if (err) return res.json({Message: err.message})
+        else return res.json({Status: "Success"})
+    })
+})
+
+app.post('/delete-account', (req, res) => {
+    const sql = "DELETE FROM accounts WHERE email = ?"
+    const email = req.body.email
+    db.query(sql, [email], (err) => {
+        if (err) return res.json({Message: err.message})
+        else return res.json({Status: "Success"})
+    })
+})
+  
 app.listen(port, () => {
     console.log(`App is listening on port ${port}.`)
 })
