@@ -4,18 +4,22 @@ import Login from './pages/Login'
 import Home from './pages/Home'
 import Register from './pages/Register'
 import Logout from './pages/Logout'
+import { useState } from 'react'
 import Navbar from './components/Navbar'
-import { auth } from './helpers/userAuth'
 
 function App() {
+  const [auth, setAuth] = useState({
+    logged_in: localStorage.getItem("token") !== null,
+    user: localStorage.getItem("token") + ""
+  })
   return (
     <BrowserRouter>
-      <Navbar loggedIn={auth}></Navbar>
+      <Navbar auth={auth.logged_in}></Navbar>
       <Routes>
-        <Route path="/login" element={<Login/>}></Route>
+        <Route path="/login" element={<Login logged_in={auth.logged_in} setAuth={setAuth}/>}></Route>
         <Route path="/" element={<Home/>}></Route>
         <Route path="/register" element={<Register/>}></Route>
-        <Route path="/logout" element={<Logout/>}></Route>
+        <Route path="/logout" element={<Logout setAuth={setAuth} logged_in={auth.logged_in}/>}></Route>
       </Routes>
     </BrowserRouter>
   )

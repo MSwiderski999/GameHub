@@ -1,7 +1,10 @@
 import { Link } from "react-router-dom"
 
-export default function NavRoutes(authStatus : boolean){
-    if(authStatus){
+interface NavRoutesProps{
+    authStatus: boolean
+}
+export default function NavRoutes(props: NavRoutesProps){
+    if(props.authStatus){
         return (
             <div className="nav-list">
                 <div className={"nav-item"} key={"Home"}><Link className={"nav-link"} to={"/"}>Home</Link></div>

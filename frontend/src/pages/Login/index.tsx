@@ -4,7 +4,15 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import React from "react";
 
-export default function Login(){
+interface LoginProps{
+    setAuth: React.Dispatch<React.SetStateAction<{
+    logged_in: boolean;
+    user: string;
+    }>>,
+    logged_in: boolean
+}
+
+export default function Login(props: LoginProps){
     const [values, setValues] = useState({
         email: "",
         password: "",
@@ -17,8 +25,11 @@ export default function Login(){
         axios.post('http://localhost:3000/login', values)
         .then(res => {
             if(res.data.Status === "Success"){
-                alert("Logged in succesfully!")
-                navigate('/')
+                props.setAuth({
+                    logged_in: true,
+                    user: values.email
+                })
+                localStorage.setItem("token", values.email + "|" + values.password)
             }else {
                 alert(res.data.Message)
             }
@@ -27,6 +38,8 @@ export default function Login(){
     }
 
     return (
+        !props.logged_in
+        ?
         <FormContainer>
             <form onSubmit={handleSubmit}>
                 <h1>Login to Your Account</h1>
@@ -40,6 +53,13 @@ export default function Login(){
                 </div>
                 <button type="submit" className="submit-btn">Log in</button>
                 <p>Don't have an account? <a href="/register">Register</a></p>
+            </form>
+        </FormContainer>
+        :
+        <FormContainer>
+            <form>
+                <h1>You are logged in!</h1>
+                <button className="info-btn" onClick={() => navigate('/')}>Return to homepage</button>
             </form>
         </FormContainer>
     )

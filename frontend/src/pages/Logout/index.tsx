@@ -1,28 +1,40 @@
 import React from "react";
 import FormContainer from "../../components/AccountForm";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-export default function Logout(){
+interface LogoutProps{
+    setAuth: React.Dispatch<React.SetStateAction<{
+    logged_in: boolean;
+    user: string;
+    }>>,
+    logged_in: boolean
+}
+
+export default function Logout(props: LogoutProps){
     const navigate = useNavigate()
-    axios.defaults.withCredentials = true
     const handleLogout = () => {
-        axios.get('http://localhost:3001/logout')
-        .then(res => {
-            if(res.data.Status === "Success"){
-                navigate('/login')
-            }else {
-                alert("internal error")
-            }
-        }).catch(err => console.log(err))
+        props.setAuth({
+            logged_in: false,
+            user: ""
+        })
+        localStorage.clear()
     }
 
     return (
+        props.logged_in
+        ?
         <FormContainer>
             <form>
                 <h1>Are you sure you want to log out?</h1>
                 <button className="submit-btn" onClick={handleLogout}>Log out</button>
                 <p><a href="/">Cancel</a></p>
+            </form>
+        </FormContainer>
+        :
+        <FormContainer>
+            <form>
+                <h1>You are logged out!</h1>
+                <button className="info-btn" onClick={() => navigate('/')}>Return to homepage</button>
             </form>
         </FormContainer>
     )

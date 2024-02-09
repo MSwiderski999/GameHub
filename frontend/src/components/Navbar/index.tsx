@@ -1,18 +1,16 @@
-import React, { ReactElement } from 'react'
 import NavRoutes from './navRoutes'
 import './navbar.scss'
 
 interface NavbarProps{
-    loggedIn: boolean
+    auth: boolean
 }
-
-export default function Navbar(props : NavbarProps){
+export default function Navbar(props: NavbarProps){
     return (
         <div id="app-nav">
             <div id="app-brand">
                 GameHub
             </div>
-                <NavRoutes loggedIn={props.loggedIn}></NavRoutes>
+                <NavRoutes authStatus={props.auth}></NavRoutes>
         </div>
     )
 }
