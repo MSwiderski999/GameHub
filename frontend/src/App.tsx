@@ -13,7 +13,7 @@ function App() {
     user: localStorage.getItem("token") + ""
   })
   return (
-    <BrowserRouter>
+      <BrowserRouter>
       <Navbar auth={auth.logged_in}></Navbar>
       <Routes>
         <Route path="/login" element={<Login logged_in={auth.logged_in} setAuth={setAuth}/>}></Route>

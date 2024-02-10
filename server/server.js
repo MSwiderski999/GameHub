@@ -1,7 +1,6 @@
 import express from 'express'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
-import jwt from 'jsonwebtoken'
 import mysql from 'mysql'
 import bcrypt from 'bcrypt'
 

@@ -1,11 +1,7 @@
-import { ReactElement } from "react";
+import Thumbnail from "../../components/Thumbnail";
 
-interface HomeProps{
-    children?: ReactElement
-}
-
-export default function Home(props: HomeProps){
+export default function Home(){
     return (
-        <><h1>Home</h1>{props.children}</>
+        <><Thumbnail name={"Uno"} imgsrc="../../../public/Images/uno-thumbnail.jpg"/></>
     )
 }
