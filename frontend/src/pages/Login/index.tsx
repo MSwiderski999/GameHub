@@ -34,7 +34,7 @@ export default function Login(props: LoginProps){
                 alert(res.data.Message)
             }
         })
-        .then(err => console.log(err))
+        .catch(err => console.log(err))
     }
 
     return (
