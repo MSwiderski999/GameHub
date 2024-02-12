@@ -5,6 +5,7 @@
     border-radius: 15px;
     font-weight: 900;
     position: relative;
+    -webkit-text-stroke-color: black;
 }
 
 .corner-symbol{
@@ -17,35 +18,45 @@
     border-radius: 20px;
     font-size: 30px;
     position: absolute;
+    -webkit-text-stroke-width: 1px;
+    text-shadow: 1px 2px 2px black;
 }
 
 #top-left{
-    top: 2px;
-    left: 2px;
+    top: 3px;
+    left: 3px;
 }
 
 #bottom-right{
-    bottom: 2px;
-    right: 2px;
+    bottom: 3px;
+    right: 3px;
+    transform: rotateY(0deg) rotate(180deg);
 }
 
 .main-symbol{
     background-color: white;
     width: 90px;
-    height: 140px;
+    height: 150px;
     display: flex;
     justify-content: center;
     align-items: center;
     border-radius: 50%;
     font-size: 70px;
     position: absolute;
-    top: 35px;
+    top: 30px;
     left: 20px;
     transform: rotateY(0deg) rotate(45deg);
+    -webkit-text-stroke-width: 2px;
+    text-shadow: 1px 2px 2px black;
 }
 
 #main-span{
     transform: rotateY(0deg) rotate(-45deg);
+}
+
+#corner-span{
+    position: absolute;
+    bottom: 0px;
 }
 
 .red{
