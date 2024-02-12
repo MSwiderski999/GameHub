@@ -5,10 +5,17 @@ interface CardProps{
     suit: string,
     value: number,
     effect?: () => {}
+    backSide?: true
 }
 
 export default function Card(props: CardProps){
     return (
+        props.backSide
+        ?
+        <div className={"card back-side"}>
+            <div className="back-symbol"><span id="back-span">UNO</span></div>
+        </div>
+        :
         <div className={"card" + " " + props.suit}>
             <div className="corner-symbol" id="top-left">{props.symbol}</div>
             <div className="main-symbol"><span id="main-span">{props.symbol}</span></div>

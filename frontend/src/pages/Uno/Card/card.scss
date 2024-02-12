@@ -79,3 +79,27 @@
     background-color: black;
     color: black;
 }
+
+.back-side{
+    background-color: black;
+}
+.back-symbol{
+    background-color: red;
+    width: 90px;
+    height: 150px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    font-size: 60px;
+    position: absolute;
+    top: 30px;
+    left: 20px;
+    transform: rotateY(0deg) rotate(45deg);
+    -webkit-text-stroke-width: 2px;
+    text-shadow: 1px 2px 2px black;
+    color: yellow;
+}
+#back-span{
+    transform: rotateY(0deg) rotate(-90deg);
+}
