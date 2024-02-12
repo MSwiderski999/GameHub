@@ -6,6 +6,7 @@ import Register from './pages/Register'
 import Logout from './pages/Logout'
 import { useState } from 'react'
 import Navbar from './components/Navbar'
+import Uno from './pages/Uno'
 
 function App() {
   const [auth, setAuth] = useState({
@@ -20,6 +21,7 @@ function App() {
         <Route path="/" element={<Home/>}></Route>
         <Route path="/register" element={<Register/>}></Route>
         <Route path="/logout" element={<Logout setAuth={setAuth} logged_in={auth.logged_in}/>}></Route>
+        <Route path="/uno" element={<Uno/>}></Route>
       </Routes>
     </BrowserRouter>
   )
