@@ -1,12 +1,37 @@
-import Card from "./Card";
+import { useState } from "react";
+import GameForm from "../../components/GameForm";
+import CardDisplay from "./CardDisplay";
 
 export default function Uno(){
+    const [active, setActive] = useState(false)
     return (
-        <>
-        <Card symbol="1" suit="blue" value={1} backSide></Card>
-        <Card symbol="2" suit="green" value={2}></Card>
-        <Card symbol="3" suit="red" value={3}></Card>
-        <Card symbol="4" suit="yellow" value={4}></Card>
-        </>
+        active
+        ?
+        <CardDisplay symbol="3" suit="blue" value={3}/>
+        :
+        <GameForm onSubmit={async () => setActive(true)}>
+            <>
+            <p className="input-label">Number of bots</p>
+            <div className="multiple-choice-container">
+                <div className="multiple-choice">1</div>
+                <div className="multiple-choice">2</div>
+                <div className="multiple-choice">3</div>
+            </div>
+
+            <p className="input-label">Difficulty</p>
+            <div className="multiple-choice-container">
+                <div className="multiple-choice">Easy</div>
+                <div className="multiple-choice">Medium</div>
+                <div className="multiple-choice">Hard</div>
+            </div>
+
+            <p className="input-label">Mode</p>
+            <div className="multiple-choice-container">
+                <div className="multiple-choice">Single Game</div>
+                <div className="multiple-choice">Best Of 5</div>
+                <div className="multiple-choice">Best Of 10</div>
+            </div>
+            </>
+        </GameForm>
     )
 }

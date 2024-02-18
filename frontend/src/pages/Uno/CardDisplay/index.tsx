@@ -8,7 +8,7 @@ interface CardProps{
     backSide?: true
 }
 
-export default function Card(props: CardProps){
+export default function CardDisplay(props: CardProps){
     return (
         props.backSide
         ?
