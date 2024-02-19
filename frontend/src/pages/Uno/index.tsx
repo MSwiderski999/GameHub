@@ -4,12 +4,15 @@ import CardDisplay from "./CardDisplay";
 
 export default function Uno(){
     const [active, setActive] = useState(false)
+    const StartGame = () =>{
+        setActive(true)
+    }
     return (
         active
         ?
         <CardDisplay symbol="3" suit="blue" value={3}/>
         :
-        <GameForm onSubmit={async () => setActive(true)}>
+        <GameForm onSubmit={async () => StartGame()}>
             <>
             <p className="input-label">Number of bots</p>
             <div className="multiple-choice-container">
