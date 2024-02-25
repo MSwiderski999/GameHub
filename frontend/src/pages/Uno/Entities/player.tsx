@@ -6,4 +6,5 @@ export interface Player{
 
     wins?: number
     points?: number
+    ai: boolean
 }

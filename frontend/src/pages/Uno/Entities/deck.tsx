@@ -119,4 +119,13 @@ const Deck: Array<Card> = [
     {suit: "changeColor", symbol: "⊕", value: 50}
 ]
 
-export { Deck }
+const shuffle = (deck: Card[]) => { 
+    return deck.sort(() => Math.random() - 0.5); 
+}
+
+const take = (deck: Card[]) => {
+   let card = deck.pop()
+   return card as Card
+}
+
+export { Deck, take, shuffle }

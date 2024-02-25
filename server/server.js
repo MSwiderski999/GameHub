@@ -3,6 +3,7 @@ import cors from 'cors'
 import cookieParser from 'cookie-parser'
 import mysql from 'mysql'
 import bcrypt from 'bcrypt'
+import jwt from 'jsonwebtoken'
 
 const port = 3000
 const salt = 10
@@ -36,6 +37,7 @@ app.post('/login', (req, res) => {
                     return res.json({Message: err.message})
                 }
                 if (response){
+                    res.cookie('login_token', jwt.sign({id: data.id}, "jwt-secret-key"))
                     return res.json({Status: "Success"})
                 }
                 else {
@@ -46,6 +48,10 @@ app.post('/login', (req, res) => {
             return res.json({Message: "No email found in database"})
         }
     })
+})
+
+app.post('/logout',(req, res) => {
+    res.clearCookie('login_token')
 })
 
 app.post('/register', (req, res) => {

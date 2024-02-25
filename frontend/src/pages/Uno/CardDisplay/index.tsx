@@ -3,9 +3,8 @@ import './card.scss'
 interface CardProps{
     symbol: string,
     suit: string,
-    value: number,
     effect?: () => {}
-    backSide?: true
+    backSide?: boolean
 }
 
 export default function CardDisplay(props: CardProps){

@@ -45,9 +45,13 @@
     border-radius: 5px;
 }
 
-.multiple-choice:hover, .multiple-choice-selected{
+.multiple-choice:hover{
     border-inline: 2px solid white;
     cursor: pointer;
+}
+
+.multiple-choice-selected{
+    background-color: rgb(173, 12, 194);
 }
 
 .input-label{
