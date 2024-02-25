@@ -10,6 +10,7 @@ export default function NavRoutes(props: NavRoutesProps){
                 <div className={"nav-item"} key={"Home"}><Link className={"nav-link"} to={"/"}>Home</Link></div>
                 <div className={"nav-item"} key={"Home"}><Link className={"nav-link"} to={"/"}>Profile</Link></div>
                 <div className={"nav-item"} key={"Logout"}><Link className={"nav-link"} to={"/logout"}>Logout</Link></div>
+                <div className={"nav-item"} key={"GitHub"}><Link target="_blank" className={"nav-link"} to={"https://github.com/MSwiderski999/GameHub"}>GitHub</Link></div>
             </div>
         )
     }else{

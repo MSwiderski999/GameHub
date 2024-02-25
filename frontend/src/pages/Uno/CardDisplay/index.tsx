@@ -3,7 +3,6 @@ import './card.scss'
 interface CardProps{
     symbol: string,
     suit: string,
-    effect?: () => {}
     backSide?: boolean
 }
 

@@ -9,6 +9,7 @@ import '../../../public/Images/bot.png'
 import PlayerTag from "../../components/PlayerTag";
 import Hand from "./HandDisplay";
 import { Card } from "./Entities/card";
+import './uno.scss'
 
 export default function Uno(){
     const [active, setActive] = useState(false)
@@ -67,26 +68,32 @@ export default function Uno(){
         active
         ?
         <GameContainer>
-            <PlayerTag photoSrc="../../../public/Images/guest.png" playerName="Guest"/>
-            <Hand>
-                {playerHand}
-            </Hand>
+            <div id="bottom-player">
+                <PlayerTag photoSrc="../../../public/Images/guest.png" playerName="Guest"/>
+                <Hand>
+                    {playerHand}
+                </Hand>
+            </div>
 
-            <PlayerTag photoSrc="../../../public/Images/bot.png" playerName="Bot"/>
-            <Hand>
-                {bot1Hand}
-            </Hand>
+            <div id="top-player">
+                <PlayerTag photoSrc="../../../public/Images/bot.png" playerName="Bot"/>
+                <Hand>
+                    {bot1Hand}
+                </Hand>
+            </div>
 
             {numberOfBots >= 2 && <>
-            <PlayerTag photoSrc="../../../public/Images/bot.png" playerName="Bot"/>
-            <Hand>{bot2Hand}</Hand></>}
+            <div><PlayerTag photoSrc="../../../public/Images/bot.png" playerName="Bot"/>
+            <Hand>{bot2Hand}</Hand></div></>}
 
             {numberOfBots == 3 && <>
-            <PlayerTag photoSrc="../../../public/Images/bot.png" playerName="Bot"/>
-            <Hand>{bot3Hand}</Hand></>}
+            <div><PlayerTag photoSrc="../../../public/Images/bot.png" playerName="Bot"/>
+            <Hand>{bot3Hand}</Hand></div></>}
 
-            <CardDisplay symbol={current_card.symbol} suit={current_card.suit} backSide={current_card.backside}/>
-            <CardDisplay symbol={""} suit={""} backSide/>
+            <div id="center-cards">
+                <CardDisplay symbol={current_card.symbol} suit={current_card.suit} backSide={current_card.backside}/>
+                <CardDisplay symbol={""} suit={""} backSide/>
+            </div>
         </GameContainer>
         :
         <GameForm onSubmit={async () => StartGame()}>
