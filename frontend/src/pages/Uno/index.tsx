@@ -51,13 +51,13 @@ export default function Uno(){
                     setPlayerHand(playerHand => [...playerHand, <CardDisplay suit={taken.suit} symbol={taken.symbol}/>])
                     break
                 case 1:
-                    setBot1Hand(bot1Hand => [...bot1Hand, <CardDisplay suit={taken.suit} symbol={taken.symbol}/>])
+                    setBot1Hand(bot1Hand => [...bot1Hand, <CardDisplay suit={taken.suit} symbol={taken.symbol} backSide/>])
                     break
                 case 2:
-                    setBot2Hand(bot2Hand => [...bot2Hand, <CardDisplay suit={taken.suit} symbol={taken.symbol}/>])
+                    setBot2Hand(bot2Hand => [...bot2Hand, <CardDisplay suit={taken.suit} symbol={taken.symbol} backSide/>])
                     break
                 case 3:
-                    setBot3Hand(bot3Hand => [...bot3Hand, <CardDisplay suit={taken.suit} symbol={taken.symbol}/>])
+                    setBot3Hand(bot3Hand => [...bot3Hand, <CardDisplay suit={taken.suit} symbol={taken.symbol} backSide/>])
                     break
             }
         }
@@ -68,27 +68,35 @@ export default function Uno(){
         active
         ?
         <GameContainer>
-            <div id="bottom-player">
+            <div id="bottom">
+            <div id="bottom-tag">
                 <PlayerTag photoSrc="../../../public/Images/guest.png" playerName="Guest"/>
+            </div>
+            <div id="bottom-hand">
                 <Hand>
                     {playerHand}
                 </Hand>
             </div>
+            </div>
 
-            <div id="top-player">
+            <div id="top">
+            <div id="top-tag">
                 <PlayerTag photoSrc="../../../public/Images/bot.png" playerName="Bot"/>
+            </div>
+            <div id="top-hand">
                 <Hand>
                     {bot1Hand}
                 </Hand>
             </div>
+            </div>
 
-            {numberOfBots >= 2 && <>
-            <div><PlayerTag photoSrc="../../../public/Images/bot.png" playerName="Bot"/>
-            <Hand>{bot2Hand}</Hand></div></>}
+            {numberOfBots >= 2 && <div id="left">
+            <div id="left-tag"><PlayerTag photoSrc="../../../public/Images/bot.png" playerName="Bot"/></div>
+            <div id="left-hand"><Hand rotated>{bot2Hand}</Hand></div></div>}
 
-            {numberOfBots == 3 && <>
-            <div><PlayerTag photoSrc="../../../public/Images/bot.png" playerName="Bot"/>
-            <Hand>{bot3Hand}</Hand></div></>}
+            {numberOfBots == 3 && <div id="right">
+            <div id="right-tag"><PlayerTag photoSrc="../../../public/Images/bot.png" playerName="Bot"/></div>
+            <div id="right-hand"><Hand rotated>{bot3Hand}</Hand></div></div>}
 
             <div id="center-cards">
                 <CardDisplay symbol={current_card.symbol} suit={current_card.suit} backSide={current_card.backside}/>
