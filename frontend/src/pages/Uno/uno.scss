@@ -4,7 +4,7 @@
     left: 20%;
     
     display: flex;
-    flex-direction: column-reverse;
+    flex-direction: column;
 }
 
 #left{
@@ -19,7 +19,7 @@
 #top{
     position: absolute;
     top: 0;
-    right: 20%;
+    left: 50%;
 
     display: flex;
     flex-direction: column;
@@ -28,14 +28,10 @@
 #right{
     position: absolute;
     right: 0;
-    bottom: 20%;
+    bottom: 40%;
 
     display: flex;
-    flex-direction: column-reverse;
-}
-
-#right-hand{
-    margin-right: 0;
+    flex-direction: column;
 }
 
 #center-cards{
@@ -45,25 +41,4 @@
 
 #center-cards > *{
     margin: 10px;
-}
-
-.vertical{
-    row-gap: 4.2rem;
-    grid-template-columns: repeat(5, 25px);
-}
-
-.rotated{
-    column-gap: 4.2rem;
-    grid-template-rows: repeat(5, 25px);
-}
-
-.rotated > *{
-    width: 147px;
-    height: 91px;
-}
-
-.rotated > * > *{
-    top: -6px;
-    left: 40px;
-    transform: rotate(-45deg);
 }

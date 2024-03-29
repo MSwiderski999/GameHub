@@ -1,21 +1,58 @@
 .card{
-    width: 91px;
-    height: 147px;
     border: 6px solid white;
     border-radius: 15px;
     font-weight: 650;
     position: relative;
     -webkit-text-stroke-color: black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.horizontal{
+    width: 147px;
+    height: 91px;
+}
+
+.vertical{
+    width: 91px;
+    height: 147px;
+}
+
+.symbol{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+}
+
+.main-symbol{
+    -webkit-text-stroke-width: 2px;
+    text-shadow: 1px 2px 2px black;
+    font-size: 42px;
+    transform: rotate(45deg);
+}
+
+#main-span-left{
+    transform: rotate(0deg);
+}
+#main-span-right{
+    transform: rotate(-180deg);
+}
+#main-span-down{
+    transform: rotate(-90deg);
+}
+#main-span-up{
+    transform: rotate(90deg);
+}
+#main-span-front{
+    transform: rotate(-45deg);
 }
 
 .corner-symbol{
     background-color: white;
     width: 28px;
     height: 28px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 14px;
     font-size: 21px;
     position: absolute;
     -webkit-text-stroke-width: 1px;
@@ -30,33 +67,26 @@
 #bottom-right{
     bottom: 3px;
     right: 3px;
-    transform: rotateY(0deg) rotate(180deg);
+    transform: rotate(180deg);
 }
 
-.main-symbol{
+.front-symbol{
     background-color: white;
+}
+
+.back-symbol{
+    background-color: red;
+    color: yellow;
+}
+
+.vertical-symbol{
     width: 63px;
     height: 105px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 50%;
-    font-size: 49px;
-    position: absolute;
-    top: 21px;
-    left: 14px;
-    transform: rotate(45deg);
-    -webkit-text-stroke-width: 2px;
-    text-shadow: 1px 2px 2px black;
 }
 
-#main-span{
-    transform: rotateY(0deg) rotate(-45deg);
-}
-
-#corner-span{
-    position: absolute;
-    bottom: 0px;
+.horizontal-symbol{
+    width: 105px;
+    height: 63px;
 }
 
 .red{
@@ -82,24 +112,4 @@
 
 .back-side{
     background-color: black;
-}
-.back-symbol{
-    background-color: red;
-    width: 63px;
-    height: 105px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 50%;
-    font-size: 42px;
-    position: absolute;
-    top: 21px;
-    left: 14px;
-    transform: rotateY(0deg) rotate(45deg);
-    -webkit-text-stroke-width: 2px;
-    text-shadow: 1px 2px 2px black;
-    color: yellow;
-}
-#back-span{
-    transform: rotateY(0deg) rotate(-90deg);
 }

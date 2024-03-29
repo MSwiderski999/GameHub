@@ -29,8 +29,9 @@ export default function Uno(){
     const [bot2Hand, setBot2Hand] = useState(new Array<ReactElement>)
     const [bot3Hand, setBot3Hand] = useState(new Array<ReactElement>)
 
-    const StartGame = () =>{
+    const StartGame = async () =>{
         setActive(true)
+        const delay = (ms: number | undefined) => new Promise(res => setTimeout(res, ms))
 
         const game: Game = {
             gamesTotal: 0,
@@ -38,31 +39,38 @@ export default function Uno(){
             players: [{name: "Guest", hand: [], ai: false}, {name: "Bot 1", hand: [], ai: true}],
             deck: shuffle(Deck)
         }
-        if(numberOfBots >= 1)game.players.push({name: "Bot 2", hand: [], ai: true})
+        if(numberOfBots > 1)game.players.push({name: "Bot 2", hand: [], ai: true})
         if(numberOfBots == 3)game.players.push({name: "Bot 3", hand: [], ai: true})
 
         let numOfPlayers = game.players.length
 
-        for(let i = 0; i < 3 * numOfPlayers; i++){
+        for(let i = 0; i < 7 * numOfPlayers; i++){
             const taken : Card = take(game.deck)
+            await delay(50)
             game.players[i % numOfPlayers].hand.push(taken)
             switch(i % numOfPlayers){
                 case 0:
-                    setPlayerHand(playerHand => [...playerHand, <CardDisplay suit={taken.suit} symbol={taken.symbol}/>])
+                    setPlayerHand(playerHand => [...playerHand, <div className="card-container">
+                        <CardDisplay suit={taken.suit} symbol={taken.symbol} facing="down"/></div>])
                     break
                 case 1:
-                    setBot1Hand(bot1Hand => [...bot1Hand, <CardDisplay suit={taken.suit} symbol={taken.symbol} backSide/>])
+                    setBot1Hand(bot1Hand => [...bot1Hand, <div className="card-container">
+                        <CardDisplay suit={taken.suit} symbol={taken.symbol} backSide facing="up"/></div>])
                     break
                 case 2:
-                    setBot2Hand(bot2Hand => [...bot2Hand, <CardDisplay suit={taken.suit} symbol={taken.symbol} backSide/>])
+                    setBot2Hand(bot2Hand => [...bot2Hand, <div className="card-container">
+                        <CardDisplay suit={taken.suit} symbol={taken.symbol} backSide facing="left"/></div>])
                     break
                 case 3:
-                    setBot3Hand(bot3Hand => [...bot3Hand, <CardDisplay suit={taken.suit} symbol={taken.symbol} backSide/>])
+                    setBot3Hand(bot3Hand => [...bot3Hand, <div className="card-container">
+                        <CardDisplay suit={taken.suit} symbol={taken.symbol} backSide facing="right"/></div>])
                     break
             }
         }
         game.current_card = take(game.deck)
         setCurrentCard({suit: game.current_card.suit, symbol: game.current_card.symbol, backside: false})
+
+        
     }
     return (
         active
@@ -73,7 +81,7 @@ export default function Uno(){
                 <PlayerTag photoSrc="../../../public/Images/guest.png" playerName="Guest"/>
             </div>
             <div id="bottom-hand">
-                <Hand>
+                <Hand player>
                     {playerHand}
                 </Hand>
             </div>
@@ -99,8 +107,8 @@ export default function Uno(){
             <div id="right-hand"><Hand rotated>{bot3Hand}</Hand></div></div>}
 
             <div id="center-cards">
-                <CardDisplay symbol={current_card.symbol} suit={current_card.suit} backSide={current_card.backside}/>
-                <CardDisplay symbol={""} suit={""} backSide/>
+                <CardDisplay symbol={current_card.symbol} suit={current_card.suit} backSide={current_card.backside} facing="down"/>
+                <CardDisplay symbol={""} suit={""} backSide facing="down"/>
             </div>
         </GameContainer>
         :
