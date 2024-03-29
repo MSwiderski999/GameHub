@@ -31,8 +31,9 @@ export default function Uno(){
 
     const StartGame = async () =>{
         setActive(true)
-        const delay = (ms: number | undefined) => new Promise(res => setTimeout(res, ms))
+        const delay = (ms: number | undefined) => new Promise(res => setTimeout(res, ms)) //delay for smooth animation
 
+        //create game
         const game: Game = {
             gamesTotal: 0,
             gamesPlayed: 0,
@@ -43,7 +44,9 @@ export default function Uno(){
         if(numberOfBots == 3)game.players.push({name: "Bot 3", hand: [], ai: true})
 
         let numOfPlayers = game.players.length
+        //creat game ; END
 
+        //distributing cards
         for(let i = 0; i < 7 * numOfPlayers; i++){
             const taken : Card = take(game.deck)
             await delay(50)
@@ -69,8 +72,25 @@ export default function Uno(){
         }
         game.current_card = take(game.deck)
         setCurrentCard({suit: game.current_card.suit, symbol: game.current_card.symbol, backside: false})
-
-        
+        if(game.current_card.suit == "changeColor"){
+            await delay(500)
+            var r = Math.floor(Math.random() * 4)
+            switch(r){
+                case 0:
+                    setCurrentCard({suit: "blue", symbol: game.current_card.symbol, backside: false})
+                    break
+                case 1:
+                    setCurrentCard({suit: "green", symbol: game.current_card.symbol, backside: false})
+                    break
+                case 2:
+                    setCurrentCard({suit: "red", symbol: game.current_card.symbol, backside: false})
+                    break
+                case 3:
+                    setCurrentCard({suit: "yellow", symbol: game.current_card.symbol, backside: false})
+                    break
+            }
+        }
+        //distributing cards ; END
     }
     return (
         active
