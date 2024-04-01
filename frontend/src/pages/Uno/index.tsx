@@ -10,6 +10,7 @@ import PlayerTag from "../../components/PlayerTag";
 import Hand from "./HandDisplay";
 import { Card } from "./Entities/card";
 import './uno.scss'
+import { getName } from "../../helpers/getBotName";
 
 export default function Uno(){
     const [active, setActive] = useState(false)
@@ -29,6 +30,8 @@ export default function Uno(){
     const [bot2Hand, setBot2Hand] = useState(new Array<ReactElement>)
     const [bot3Hand, setBot3Hand] = useState(new Array<ReactElement>)
 
+    const [botNames] = useState([getName(), getName(), getName()])
+
     const StartGame = async () =>{
         setActive(true)
         const delay = (ms: number | undefined) => new Promise(res => setTimeout(res, ms)) //delay for smooth animation
@@ -37,11 +40,11 @@ export default function Uno(){
         const game: Game = {
             gamesTotal: 0,
             gamesPlayed: 0,
-            players: [{name: "Guest", hand: [], ai: false}, {name: "Bot 1", hand: [], ai: true}],
+            players: [{name: "Guest", hand: [], ai: false}, {name: botNames[0], hand: [], ai: true}],
             deck: shuffle(Deck)
         }
-        if(numberOfBots > 1)game.players.push({name: "Bot 2", hand: [], ai: true})
-        if(numberOfBots == 3)game.players.push({name: "Bot 3", hand: [], ai: true})
+        if(numberOfBots > 1)game.players.push({name: botNames[1], hand: [], ai: true})
+        if(numberOfBots == 3)game.players.push({name: botNames[2], hand: [], ai: true})
 
         let numOfPlayers = game.players.length
         //creat game ; END
@@ -109,7 +112,7 @@ export default function Uno(){
 
             <div id="top">
             <div id="top-tag">
-                <PlayerTag photoSrc="../../../public/Images/bot.png" playerName="Bot"/>
+                <PlayerTag photoSrc="../../../public/Images/bot.png" playerName={botNames[0]}/>
             </div>
             <div id="top-hand">
                 <Hand>
@@ -119,11 +122,11 @@ export default function Uno(){
             </div>
 
             {numberOfBots >= 2 && <div id="left">
-            <div id="left-tag"><PlayerTag photoSrc="../../../public/Images/bot.png" playerName="Bot"/></div>
+            <div id="left-tag"><PlayerTag photoSrc="../../../public/Images/bot.png" playerName={botNames[1]}/></div>
             <div id="left-hand"><Hand rotated>{bot2Hand}</Hand></div></div>}
 
             {numberOfBots == 3 && <div id="right">
-            <div id="right-tag"><PlayerTag photoSrc="../../../public/Images/bot.png" playerName="Bot"/></div>
+            <div id="right-tag"><PlayerTag photoSrc="../../../public/Images/bot.png" playerName={botNames[2]}/></div>
             <div id="right-hand"><Hand rotated>{bot3Hand}</Hand></div></div>}
 
             <div id="center-cards">
