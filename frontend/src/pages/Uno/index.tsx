@@ -11,6 +11,7 @@ import Hand from "./HandDisplay";
 import { Card } from "./Entities/card";
 import './uno.scss'
 import { getName } from "../../helpers/getBotName";
+import { play_optimal } from "./Functions/playCard";
 
 export default function Uno(){
     const [active, setActive] = useState(false)
@@ -94,6 +95,7 @@ export default function Uno(){
             }
         }
         //distributing cards ; END
+        play_optimal(game.players[0], game.current_card)
     }
     return (
         active
