@@ -5,7 +5,12 @@ import { from } from "linq-to-typescript"
 
 
 const pick_suit = (hand: Card[]) => {
-    let c : any = {}
+    let c : any = {
+        "blue": [],
+        "red": [],
+        "green": [],
+        "yellow": []
+    }
     hand.forEach(card => {
         c[card.suit] = c[card.suit] || []
         c[card.suit].push(card)

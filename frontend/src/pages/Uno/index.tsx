@@ -58,12 +58,12 @@ export default function Uno(){
                         <CardDisplay suit={taken.suit} symbol={taken.symbol} facing="down"/></div>])
                     break
                 case 1:
-                    setBot1Hand(bot1Hand => [...bot1Hand, <div className="card-container">
-                        <CardDisplay suit={taken.suit} symbol={taken.symbol} backSide facing="up"/></div>])
+                    setBot2Hand(bot1Hand => [...bot1Hand, <div className="card-container">
+                        <CardDisplay suit={taken.suit} symbol={taken.symbol} backSide facing="left"/></div>])
                     break
                 case 2:
-                    setBot2Hand(bot2Hand => [...bot2Hand, <div className="card-container">
-                        <CardDisplay suit={taken.suit} symbol={taken.symbol} backSide facing="left"/></div>])
+                    setBot1Hand(bot2Hand => [...bot2Hand, <div className="card-container">
+                        <CardDisplay suit={taken.suit} symbol={taken.symbol} backSide facing="up"/></div>])
                     break
                 case 3:
                     setBot3Hand(bot3Hand => [...bot3Hand, <div className="card-container">
@@ -96,9 +96,40 @@ export default function Uno(){
         //game
         let action_index = Math.floor(Math.random() * numOfPlayers)
         while(true){
+            await delay(1500)
             let played_card = play_optimal(game.players[action_index], game.current_card)
-            if(played_card === null)break
-
+            console.log(played_card)
+            if(played_card === null){
+                await delay(1000)
+                let taken = take(game.deck)
+                if(taken === null){
+                    game.players[action_index].hand.push(taken)
+                    switch(action_index){
+                        case 0:
+                            setPlayerHand(playerHand => [...playerHand, <div className="card-container">
+                            <CardDisplay suit={taken.suit} symbol={taken.symbol} facing="down"/></div>])
+                            break
+                        case 1:
+                            setBot2Hand(bot1Hand => [...bot1Hand, <div className="card-container">
+                             <CardDisplay suit={taken.suit} symbol={taken.symbol} backSide facing="left"/></div>])
+                            break
+                        case 2:
+                            setBot1Hand(bot2Hand => [...bot2Hand, <div className="card-container">
+                            <CardDisplay suit={taken.suit} symbol={taken.symbol} backSide facing="up"/></div>])
+                            break
+                        case 3:
+                            setBot3Hand(bot3Hand => [...bot3Hand, <div className="card-container">
+                            <CardDisplay suit={taken.suit} symbol={taken.symbol} backSide facing="right"/></div>])
+                            break
+                    }
+                }
+                else game.current_card = taken
+                setCurrentCard({suit: game.current_card.suit, symbol: game.current_card.symbol, backside: false})
+            }
+            else{
+                game.current_card = played_card
+                setCurrentCard({suit: game.current_card.suit, symbol: game.current_card.symbol, backside: false})
+            }
             action_index = (action_index + 1) % numOfPlayers
         }
         //game ; END
@@ -120,7 +151,7 @@ export default function Uno(){
             <div id="top-hand"><Hand>{bot1Hand}</Hand></div></div>
 
             <div id="right">
-            <div id="right-tag"><PlayerTag photoSrc="../../../public/Images/bot.png" playerName={botNames[1]}/></div>
+            <div id="right-tag"><PlayerTag photoSrc="../../../public/Images/bot.png" playerName={botNames[2]}/></div>
             <div id="right-hand"><Hand rotated>{bot3Hand}</Hand></div></div>
 
             <div id="center-cards">
