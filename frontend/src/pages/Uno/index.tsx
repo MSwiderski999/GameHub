@@ -18,7 +18,6 @@ export default function Uno(){
 
     const [gamesTotal, setGamesTotal] = useState(1)
     const [difficulty, setDifficulty] = useState("easy")
-    const [numberOfBots, setNumberOfBots] = useState(3)
 
     const [current_card, setCurrentCard] = useState({
         symbol: "",
@@ -41,11 +40,9 @@ export default function Uno(){
         const game: Game = {
             gamesTotal: 0,
             gamesPlayed: 0,
-            players: [{name: "Guest", hand: [], ai: false}, {name: botNames[0], hand: [], ai: true}],
+            players: [{name: "Guest", hand: [], ai: false}, {name: botNames[0], hand: [], ai: true}, {name: botNames[1], hand: [], ai: true}, {name: botNames[2], hand: [], ai: true}],
             deck: shuffle(Deck)
         }
-        if(numberOfBots > 1)game.players.push({name: botNames[1], hand: [], ai: true})
-        if(numberOfBots == 3)game.players.push({name: botNames[2], hand: [], ai: true})
 
         let numOfPlayers = game.players.length
         //creat game ; END
@@ -95,41 +92,36 @@ export default function Uno(){
             }
         }
         //distributing cards ; END
-        play_optimal(game.players[0], game.current_card)
+
+        //game
+        let action_index = Math.floor(Math.random() * numOfPlayers)
+        while(true){
+            let played_card = play_optimal(game.players[action_index], game.current_card)
+            if(played_card === null)break
+
+            action_index = (action_index + 1) % numOfPlayers
+        }
+        //game ; END
     }
     return (
         active
         ?
         <GameContainer>
             <div id="bottom">
-            <div id="bottom-tag">
-                <PlayerTag photoSrc="../../../public/Images/guest.png" playerName="Guest"/>
-            </div>
-            <div id="bottom-hand">
-                <Hand player>
-                    {playerHand}
-                </Hand>
-            </div>
-            </div>
+            <div id="bottom-tag"><PlayerTag photoSrc="../../../public/Images/guest.png" playerName="Guest"/></div>
+            <div id="bottom-hand"><Hand player>{playerHand}</Hand></div></div>
+
+            <div id="left">
+            <div id="left-tag"><PlayerTag photoSrc="../../../public/Images/bot.png" playerName={botNames[0]}/></div>
+            <div id="left-hand"><Hand rotated>{bot2Hand}</Hand></div></div>
 
             <div id="top">
-            <div id="top-tag">
-                <PlayerTag photoSrc="../../../public/Images/bot.png" playerName={botNames[0]}/>
-            </div>
-            <div id="top-hand">
-                <Hand>
-                    {bot1Hand}
-                </Hand>
-            </div>
-            </div>
+            <div id="top-tag"><PlayerTag photoSrc="../../../public/Images/bot.png" playerName={botNames[1]}/></div>
+            <div id="top-hand"><Hand>{bot1Hand}</Hand></div></div>
 
-            {numberOfBots >= 2 && <div id="left">
-            <div id="left-tag"><PlayerTag photoSrc="../../../public/Images/bot.png" playerName={botNames[1]}/></div>
-            <div id="left-hand"><Hand rotated>{bot2Hand}</Hand></div></div>}
-
-            {numberOfBots == 3 && <div id="right">
-            <div id="right-tag"><PlayerTag photoSrc="../../../public/Images/bot.png" playerName={botNames[2]}/></div>
-            <div id="right-hand"><Hand rotated>{bot3Hand}</Hand></div></div>}
+            <div id="right">
+            <div id="right-tag"><PlayerTag photoSrc="../../../public/Images/bot.png" playerName={botNames[1]}/></div>
+            <div id="right-hand"><Hand rotated>{bot3Hand}</Hand></div></div>
 
             <div id="center-cards">
                 <CardDisplay symbol={current_card.symbol} suit={current_card.suit} backSide={current_card.backside} facing="down"/>
@@ -139,13 +131,6 @@ export default function Uno(){
         :
         <GameForm onSubmit={async () => StartGame()}>
             <>
-            <p className="input-label">Number of bots</p>
-            <div className="multiple-choice-container">
-                <div className={numberOfBots === 1? "multiple-choice multiple-choice-selected" : "multiple-choice"} onClick={()=>setNumberOfBots(1)}>1</div>
-                <div className={numberOfBots === 2? "multiple-choice multiple-choice-selected" : "multiple-choice"} onClick={()=>setNumberOfBots(2)}>2</div>
-                <div className={numberOfBots === 3? "multiple-choice multiple-choice-selected" : "multiple-choice"} onClick={()=>setNumberOfBots(3)}>3</div>
-            </div>
-
             <p className="input-label">Difficulty</p>
             <div className="multiple-choice-container">
                 <div className={difficulty === "easy"? "multiple-choice multiple-choice-selected" : "multiple-choice"} onClick={()=>setDifficulty("easy")}>Easy</div>
