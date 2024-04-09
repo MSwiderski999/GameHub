@@ -56,13 +56,13 @@ const play_random = (player: Player, curr_card: Card) =>{
     }
 
     player.hand.splice(index, 1)
-    return selected_card
+    return selected_card.id
 }
 
 
 
-const play_optimal = (player: Player, curr_card: Card) =>{
-    const playable_hand = from(player.hand).where((x) => isPlayable(x, curr_card)).toArray()
+const play_optimal = (hand: Card[], curr_card: Card) =>{
+    const playable_hand = from(hand).where((x) => isPlayable(x, curr_card)).toArray()
     if(playable_hand.length == 0)return null //return null if no available cards
 
     let only_color_change = true
@@ -71,19 +71,13 @@ const play_optimal = (player: Player, curr_card: Card) =>{
     })
     if(only_color_change === true){
         let selected_card : Card = playable_hand[0]
-        const index = player.hand.indexOf(selected_card)
-        let preferred_suit = pick_suit(player.hand)
-        selected_card.suit = preferred_suit
-        player.hand.splice(index, 1)
-        return selected_card
+        return selected_card.id
     }
 
     let preferred_suit = pick_suit(playable_hand)
     let final_cards = from(playable_hand).where((x) => x.suit === preferred_suit).orderByDescending((x) => x.value).toArray()
     let selected_card = final_cards[0]
-    let index = player.hand.indexOf(selected_card)
-    player.hand.splice(index, 1)
-    return selected_card
+    return selected_card.id
 }
 
 export {play_random, play_optimal}

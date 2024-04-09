@@ -6,5 +6,5 @@ export interface Game{
     gamesPlayed: number
     players: Array<Player>
     deck: Array<Card>
-    current_card?: Card
+    current_card: Card
 }

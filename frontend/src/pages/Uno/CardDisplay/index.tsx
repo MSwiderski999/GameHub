@@ -4,7 +4,8 @@ interface CardProps{
     symbol: string,
     suit: string,
     facing?: string,
-    backSide?: boolean
+    backSide?: boolean,
+    id: number
 }
 
 export default function CardDisplay(props: CardProps){
