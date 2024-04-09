@@ -13,6 +13,7 @@ import './uno.scss'
 import { getName } from "../../helpers/getBotName";
 import { play_optimal } from "./Functions/playCard";
 import { act } from "react-dom/test-utils";
+import Infobox from "../../components/InfoBox";
 
 export default function Uno(){
     //#region general hooks
@@ -35,6 +36,8 @@ export default function Uno(){
     const [bot1Hand, setBot1Hand] = useState(new Array<ReactElement>)
     const [bot2Hand, setBot2Hand] = useState(new Array<ReactElement>)
     const [bot3Hand, setBot3Hand] = useState(new Array<ReactElement>)
+
+    const [infoMessage, setInfoMessage] = useState("Good luck!")
 
     let action_index = Math.floor(Math.random() * 4)
     //#endregion
@@ -145,6 +148,8 @@ export default function Uno(){
 
         while(game.players[action_index].hand.length > 0){
             action_index = (action_index + 1) % 4
+            await delay(500)
+            setInfoMessage(game.players[action_index].name + "'s turn!")
             await delay(1000)
             game.players[action_index].hand.splice(0, 1)
             update_hand(action_index, game.players[action_index].hand)
@@ -175,6 +180,8 @@ export default function Uno(){
                 <CardDisplay symbol={current_card.symbol} suit={current_card.suit} backSide={current_card.backside} facing="down" id={current_card.id}/>
                 <CardDisplay symbol={""} suit={""} backSide facing="down" id={current_card.id}/>
             </div>
+
+            <Infobox><div>{infoMessage}</div></Infobox>
         </GameContainer>
         :
         <GameForm onSubmit={async () => StartGame()}>
