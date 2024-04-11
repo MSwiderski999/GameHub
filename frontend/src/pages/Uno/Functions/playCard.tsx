@@ -1,5 +1,4 @@
 import { Card } from "../Entities/card"
-import { Player } from "../Entities/player"
 import { isPlayable } from "./isPlayable"
 import { from } from "linq-to-typescript"
 
@@ -85,4 +84,4 @@ const play_mixed = (hand: Card[], curr_card: Card) => {
     }
 }
 
-export {play_random, play_optimal, play_mixed}
+export {play_random, play_optimal, play_mixed, pick_suit}

@@ -1,4 +1,4 @@
-import { ReactElement, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import GameForm from "../../components/GameForm";
 import CardDisplay from "./CardDisplay";
 import { Game } from "./Entities/game";
@@ -11,7 +11,7 @@ import Hand from "./HandDisplay";
 import { Card } from "./Entities/card";
 import './uno.scss'
 import { getName } from "../../helpers/getBotName";
-import { play_optimal } from "./Functions/playCard";
+import { pick_suit, play_optimal } from "./Functions/playCard";
 import Infobox from "../../components/InfoBox";
 
 export default function Uno(){
@@ -41,6 +41,8 @@ export default function Uno(){
     let action_index = Math.floor(Math.random() * 4)
     //#endregion
     
+    useEffect(() => () => setActive(false), [])
+
     //#region add card to hand
     const add_to_hand = (action_index: number, card: Card) => {
         switch(action_index){
@@ -121,6 +123,8 @@ export default function Uno(){
             game.players[i % 4].hand.push(taken)
             add_to_hand(i % 4, taken)
         }
+        sort_hand(game.players[0].hand)
+        update_hand(0, game.players[0].hand)
         game.current_card = take(game.deck)
         setCurrentCard({suit: game.current_card.suit, symbol: game.current_card.symbol, backside: false, id: game.current_card.id})
         if(game.current_card.suit == "changeColor"){
@@ -164,9 +168,19 @@ export default function Uno(){
                 await delay(1000)
                 let played_card = game.players[action_index].hand.filter((card) => card.id === played_card_id)[0]
                 game.players[action_index].hand = game.players[action_index].hand.filter((card) => card.id !== played_card_id)
+
+                game.current_card = played_card
+
+
                 setCurrentCard({suit: played_card.suit, symbol: played_card.symbol, backside: false, id: played_card.id})
+                update_hand(action_index, game.players[action_index].hand)
+                
+                if(played_card.suit === "changeColor"){
+                    await delay(1000)
+                    played_card.suit = pick_suit(game.players[action_index].hand)
+                    setCurrentCard({suit: played_card.suit, symbol: played_card.symbol, backside: false, id: played_card.id})
+                }
             }
-            update_hand(action_index, game.players[action_index].hand)
             action_index = (action_index + 1) % 4
         }
         //game ; END
