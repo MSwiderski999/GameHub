@@ -174,12 +174,14 @@ export default function Uno(){
 
                 setCurrentCard({suit: played_card.suit, symbol: played_card.symbol, backside: false, id: played_card.id})
                 update_hand(action_index, game.players[action_index].hand)
-                
+
                 if(played_card.suit === "changeColor"){
                     await delay(1000)
                     played_card.suit = pick_suit(game.players[action_index].hand)
                     setCurrentCard({suit: played_card.suit, symbol: played_card.symbol, backside: false, id: played_card.id})
                 }
+
+                if(game.players[action_index].hand.length === 0)break
             }
             action_index = (action_index + 1) % 4
         }
