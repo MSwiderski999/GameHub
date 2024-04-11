@@ -11,7 +11,7 @@ import Hand from "./HandDisplay";
 import { Card } from "./Entities/card";
 import './uno.scss'
 import { getName } from "../../helpers/getBotName";
-import { pick_suit, play_optimal } from "./Functions/playCard";
+import { pick_suit, play_random, play_mixed, play_optimal } from "./Functions/playCard";
 import Infobox from "../../components/InfoBox";
 
 export default function Uno(){
@@ -114,6 +114,22 @@ export default function Uno(){
             current_card: take(temp_deck),
             deck: temp_deck
         }
+        let play
+        if(difficulty === "easy"){
+            play = (hand: Card[], curr_card: Card) => {
+                return play_random(hand, curr_card)
+            }
+        }
+        else if(difficulty === "medium"){
+            play = (hand: Card[], curr_card: Card) => {
+                return play_mixed(hand, curr_card)
+            }
+        }
+        else{
+            play = (hand: Card[], curr_card: Card) => {
+                return play_optimal(hand, curr_card)
+            }
+        }
         //#endregion
 
         //#region distributing cards
@@ -154,7 +170,7 @@ export default function Uno(){
             await delay(500)
             setInfoMessage(<div><span className="player-name">{game.players[action_index].name}</span>'s turn!</div>)
             await delay(1000)
-            let played_card_id = play_optimal(game.players[action_index].hand, game.current_card)
+            let played_card_id = play(game.players[action_index].hand, game.current_card)
             if(played_card_id === null){//draw extra card
                 setInfoMessage(<div><span className="player-name">{game.players[action_index].name}</span> draws a card</div>)
                 await delay(1000)
@@ -162,7 +178,7 @@ export default function Uno(){
                 game.players[action_index].hand.push(taken)
                 add_to_hand(action_index, taken)
 
-                played_card_id = play_optimal(game.players[action_index].hand, game.current_card)
+                played_card_id = play(game.players[action_index].hand, game.current_card)
             }
             if(played_card_id !== null){
                 setInfoMessage(<div><span className="player-name">{game.players[action_index].name}</span> plays a card</div>)
@@ -183,7 +199,10 @@ export default function Uno(){
                     setCurrentCard({suit: played_card.suit, symbol: played_card.symbol, backside: false, id: played_card.id})
                 }
 
-                if(game.players[action_index].hand.length === 0)break 
+                //end game if a player wins
+                if(game.players[action_index].hand.length === 0){
+                    setInfoMessage(<div><span className="player-name">{game.players[action_index].name}</span><span className="keyword"> wins!</span></div>)
+                }
 
                 switch(played_card.symbol){
                     case '⊖':
@@ -197,6 +216,11 @@ export default function Uno(){
                             await delay(500)
                             game.players[(action_index + 1) % 4].hand.push(taken)
                             update_hand((action_index + 1) % 4, game.players[(action_index + 1) % 4].hand)
+
+                            if(action_index === 3){
+                                sort_hand(game.players[0].hand)
+                                update_hand(0, game.players[0].hand)
+                            }
                         }
                         action_index++
                         break
@@ -207,6 +231,11 @@ export default function Uno(){
                             await delay(500)
                             game.players[(action_index + 1) % 4].hand.push(taken)
                             update_hand((action_index + 1) % 4, game.players[(action_index + 1) % 4].hand)
+
+                            if(action_index === 3){
+                                sort_hand(game.players[0].hand)
+                                update_hand(0, game.players[0].hand)
+                            }
                         }
                         action_index++
                         break
@@ -244,7 +273,7 @@ export default function Uno(){
 
             <div id="center-cards">
                 <CardDisplay symbol={current_card.symbol} suit={current_card.suit} backSide={current_card.backside} facing="down" id={current_card.id}/>
-                <CardDisplay symbol={""} suit={""} backSide facing="down" id={current_card.id}/>
+                <div id="deck"><CardDisplay symbol={""} suit={""} backSide facing="down" id={current_card.id}/></div>
             </div>
 
             <Infobox>{infoMessage}</Infobox>
