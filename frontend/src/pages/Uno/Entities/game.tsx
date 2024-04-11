@@ -7,4 +7,5 @@ export interface Game{
     players: Array<Player>
     deck: Array<Card>
     current_card: Card
+    turn_increment: number
 }

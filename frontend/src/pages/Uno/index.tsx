@@ -112,7 +112,8 @@ export default function Uno(){
             gamesPlayed: 0,
             players: [{name: "Guest", hand: [], ai: false}, {name: botNames[0], hand: [], ai: true}, {name: botNames[1], hand: [], ai: true}, {name: botNames[2], hand: [], ai: true}],
             current_card: take(temp_deck),
-            deck: temp_deck
+            deck: temp_deck,
+            turn_increment: 3
         }
         let play
         if(difficulty === "easy"){
@@ -167,6 +168,9 @@ export default function Uno(){
 
         //#region game loop
         while(game.players[action_index].hand.length > 0){
+            let next_player = (action_index + game.turn_increment) % 4
+            console.log(next_player)
+
             await delay(500)
             setInfoMessage(<div><span className="player-name">{game.players[action_index].name}</span>'s turn!</div>)
             await delay(1000)
@@ -202,46 +206,48 @@ export default function Uno(){
                 //end game if a player wins
                 if(game.players[action_index].hand.length === 0){
                     setInfoMessage(<div><span className="player-name">{game.players[action_index].name}</span><span className="keyword"> wins!</span></div>)
+                    break
                 }
 
                 switch(played_card.symbol){
                     case '⊖':
-                        setInfoMessage(<div><span className="player-name">{game.players[(action_index + 1) % 4].name}</span><span className="danger"> skips a turn!</span></div>)
-                        action_index++
+                        setInfoMessage(<div><span className="player-name">{game.players[next_player].name}</span><span className="danger"> skips a turn!</span></div>)
+                        action_index += game.turn_increment
                         break
                     case '❏':
-                        setInfoMessage(<div><span className="player-name">{game.players[(action_index + 1) % 4].name}</span><span className="danger"> draws 2 cards!</span></div>)
+                        setInfoMessage(<div><span className="player-name">{game.players[next_player].name}</span><span className="danger"> draws 2 cards!</span></div>)
                         for(let i = 0; i < 2; i++){
                             let taken = take(game.deck)
                             await delay(500)
-                            game.players[(action_index + 1) % 4].hand.push(taken)
-                            update_hand((action_index + 1) % 4, game.players[(action_index + 1) % 4].hand)
+                            game.players[next_player].hand.push(taken)
+                            update_hand(next_player, game.players[next_player].hand)
 
-                            if(action_index === 3){
-                                sort_hand(game.players[0].hand)
-                                update_hand(0, game.players[0].hand)
-                            }
+                            sort_hand(game.players[0].hand)
+                            update_hand(0, game.players[0].hand)
                         }
-                        action_index++
+                        action_index += game.turn_increment
                         break
                     case '🗇':
-                        setInfoMessage(<div><span className="player-name">{game.players[(action_index + 1) % 4].name}</span><span className="danger"> draws 4 cards!</span></div>)
+                        setInfoMessage(<div><span className="player-name">{game.players[next_player].name}</span><span className="danger"> draws 4 cards!</span></div>)
                         for(let i = 0; i < 4; i++){
                             let taken = take(game.deck)
                             await delay(500)
-                            game.players[(action_index + 1) % 4].hand.push(taken)
-                            update_hand((action_index + 1) % 4, game.players[(action_index + 1) % 4].hand)
+                            game.players[next_player].hand.push(taken)
+                            update_hand(next_player, game.players[next_player].hand)
 
-                            if(action_index === 3){
-                                sort_hand(game.players[0].hand)
-                                update_hand(0, game.players[0].hand)
-                            }
+                            sort_hand(game.players[0].hand)
+                            update_hand(0, game.players[0].hand)
                         }
-                        action_index++
+                        action_index += game.turn_increment
+                        break
+                    case '⥂':
+                        setInfoMessage(<div><span className="keyword">Direction</span><span> changed!</span></div>)
+                        await delay(1000)
+                        game.turn_increment = game.turn_increment === 1 ? 3 : 1
                         break
                 }
             }
-            action_index = (action_index + 1) % 4
+            action_index = (action_index + game.turn_increment) % 4
 
             //refill deck
             if(game.deck.length <= 4){
