@@ -147,8 +147,9 @@ export default function Uno(){
         }
         //#endregion
 
-        //game
+        let used_cards : Card[] = []
 
+        //#region game loop
         while(game.players[action_index].hand.length > 0){
             await delay(500)
             setInfoMessage(<div><span className="player-name">{game.players[action_index].name}</span>'s turn!</div>)
@@ -170,6 +171,7 @@ export default function Uno(){
                 game.players[action_index].hand = game.players[action_index].hand.filter((card) => card.id !== played_card_id)
 
                 //update current card and hand
+                used_cards.push(played_card)
                 game.current_card = played_card
                 setCurrentCard({suit: played_card.suit, symbol: played_card.symbol, backside: false, id: played_card.id})
                 update_hand(action_index, game.players[action_index].hand)
@@ -211,8 +213,14 @@ export default function Uno(){
                 }
             }
             action_index = (action_index + 1) % 4
+
+            //refill deck
+            if(game.deck.length <= 4){
+                game.deck.concat(shuffle(used_cards))
+                used_cards = []
+            }
         }
-        //game ; END
+        //#endregion
     }
     return (
         active
