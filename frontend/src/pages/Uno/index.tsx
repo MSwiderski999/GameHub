@@ -169,19 +169,46 @@ export default function Uno(){
                 let played_card = game.players[action_index].hand.filter((card) => card.id === played_card_id)[0]
                 game.players[action_index].hand = game.players[action_index].hand.filter((card) => card.id !== played_card_id)
 
+                //update current card and hand
                 game.current_card = played_card
-
-
                 setCurrentCard({suit: played_card.suit, symbol: played_card.symbol, backside: false, id: played_card.id})
                 update_hand(action_index, game.players[action_index].hand)
 
+                //change color
                 if(played_card.suit === "changeColor"){
                     await delay(1000)
                     played_card.suit = pick_suit(game.players[action_index].hand)
                     setCurrentCard({suit: played_card.suit, symbol: played_card.symbol, backside: false, id: played_card.id})
                 }
 
-                if(game.players[action_index].hand.length === 0)break
+                if(game.players[action_index].hand.length === 0)break 
+
+                switch(played_card.symbol){
+                    case '⊖':
+                        setInfoMessage(<div><span className="player-name">{game.players[(action_index + 1) % 4].name}</span><span className="danger"> skips a turn!</span></div>)
+                        action_index++
+                        break
+                    case '❏':
+                        setInfoMessage(<div><span className="player-name">{game.players[(action_index + 1) % 4].name}</span><span className="danger"> draws 2 cards!</span></div>)
+                        for(let i = 0; i < 2; i++){
+                            let taken = take(game.deck)
+                            await delay(500)
+                            game.players[(action_index + 1) % 4].hand.push(taken)
+                            update_hand((action_index + 1) % 4, game.players[(action_index + 1) % 4].hand)
+                        }
+                        action_index++
+                        break
+                    case '🗇':
+                        setInfoMessage(<div><span className="player-name">{game.players[(action_index + 1) % 4].name}</span><span className="danger"> draws 4 cards!</span></div>)
+                        for(let i = 0; i < 4; i++){
+                            let taken = take(game.deck)
+                            await delay(500)
+                            game.players[(action_index + 1) % 4].hand.push(taken)
+                            update_hand((action_index + 1) % 4, game.players[(action_index + 1) % 4].hand)
+                        }
+                        action_index++
+                        break
+                }
             }
             action_index = (action_index + 1) % 4
         }
