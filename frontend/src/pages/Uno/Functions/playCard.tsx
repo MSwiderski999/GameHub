@@ -23,10 +23,10 @@ const pick_suit = (hand: Card[]) => {
     return highest_suit
 }
 
-const play_random = (player: Player, curr_card: Card) =>{
+const play_random = (hand: Card[], curr_card: Card) =>{
 
     let playable_hand : Array<Card> = []
-    player.hand.forEach(card => {
+    hand.forEach(card => {
         if(isPlayable(card, curr_card)) playable_hand.push(card)
     })
 
@@ -34,8 +34,6 @@ const play_random = (player: Player, curr_card: Card) =>{
 
     const rand_index : number = Math.floor(Math.random() * playable_hand.length)
     let selected_card : Card = playable_hand[rand_index]
-
-    const index = player.hand.indexOf(selected_card)
 
     if(selected_card.suit === "changeColor"){
         const rand_suit = Math.floor(Math.random() * 4)
@@ -54,8 +52,6 @@ const play_random = (player: Player, curr_card: Card) =>{
                 break
         }
     }
-
-    player.hand.splice(index, 1)
     return selected_card.id
 }
 
@@ -80,4 +76,13 @@ const play_optimal = (hand: Card[], curr_card: Card) =>{
     return selected_card.id
 }
 
-export {play_random, play_optimal}
+const play_mixed = (hand: Card[], curr_card: Card) => {
+    if(Math.round(Math.random())){
+        return play_optimal(hand, curr_card)
+    }
+    else{
+        return play_random(hand, curr_card)
+    }
+}
+
+export {play_random, play_optimal, play_mixed}

@@ -12,7 +12,6 @@ import { Card } from "./Entities/card";
 import './uno.scss'
 import { getName } from "../../helpers/getBotName";
 import { play_optimal } from "./Functions/playCard";
-import { act } from "react-dom/test-utils";
 import Infobox from "../../components/InfoBox";
 
 export default function Uno(){
@@ -37,7 +36,7 @@ export default function Uno(){
     const [bot2Hand, setBot2Hand] = useState(new Array<ReactElement>)
     const [bot3Hand, setBot3Hand] = useState(new Array<ReactElement>)
 
-    const [infoMessage, setInfoMessage] = useState("Good luck!")
+    const [infoMessage, setInfoMessage] = useState(<div>Good luck!</div>)
 
     let action_index = Math.floor(Math.random() * 4)
     //#endregion
@@ -147,12 +146,28 @@ export default function Uno(){
         //game
 
         while(game.players[action_index].hand.length > 0){
-            action_index = (action_index + 1) % 4
             await delay(500)
-            setInfoMessage(game.players[action_index].name + "'s turn!")
+            setInfoMessage(<div><span className="player-name">{game.players[action_index].name}</span>'s turn!</div>)
             await delay(1000)
-            game.players[action_index].hand.splice(0, 1)
+            let played_card_id = play_optimal(game.players[action_index].hand, game.current_card)
+            if(played_card_id === null){//draw extra card
+                setInfoMessage(<div><span className="player-name">{game.players[action_index].name}</span> draws a card</div>)
+                await delay(1000)
+                let taken = take(game.deck)
+                game.players[action_index].hand.push(taken)
+                add_to_hand(action_index, taken)
+
+                played_card_id = play_optimal(game.players[action_index].hand, game.current_card)
+            }
+            if(played_card_id !== null){
+                setInfoMessage(<div><span className="player-name">{game.players[action_index].name}</span> plays a card</div>)
+                await delay(1000)
+                let played_card = game.players[action_index].hand.filter((card) => card.id === played_card_id)[0]
+                game.players[action_index].hand = game.players[action_index].hand.filter((card) => card.id !== played_card_id)
+                setCurrentCard({suit: played_card.suit, symbol: played_card.symbol, backside: false, id: played_card.id})
+            }
             update_hand(action_index, game.players[action_index].hand)
+            action_index = (action_index + 1) % 4
         }
         //game ; END
     }
@@ -181,7 +196,7 @@ export default function Uno(){
                 <CardDisplay symbol={""} suit={""} backSide facing="down" id={current_card.id}/>
             </div>
 
-            <Infobox><div>{infoMessage}</div></Infobox>
+            <Infobox>{infoMessage}</Infobox>
         </GameContainer>
         :
         <GameForm onSubmit={async () => StartGame()}>
