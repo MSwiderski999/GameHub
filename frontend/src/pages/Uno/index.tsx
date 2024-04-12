@@ -68,7 +68,8 @@ export default function Uno(){
 
     //#region update hand
     const update_hand = (action_index: number, hand: Card[]) => {
-        switch(action_index){
+        console.log(action_index)
+        switch(action_index % 4){
             case 0:
                 setPlayerHand([])
                 hand.forEach(card => {
@@ -113,7 +114,7 @@ export default function Uno(){
             players: [{name: "Guest", hand: [], ai: false}, {name: botNames[0], hand: [], ai: true}, {name: botNames[1], hand: [], ai: true}, {name: botNames[2], hand: [], ai: true}],
             current_card: take(temp_deck),
             deck: temp_deck,
-            turn_increment: 3
+            turn_increment: 1
         }
         let play
         if(difficulty === "easy"){
@@ -169,7 +170,6 @@ export default function Uno(){
         //#region game loop
         while(game.players[action_index].hand.length > 0){
             let next_player = (action_index + game.turn_increment) % 4
-            console.log(next_player)
 
             await delay(500)
             setInfoMessage(<div><span className="player-name">{game.players[action_index].name}</span>'s turn!</div>)
@@ -203,11 +203,37 @@ export default function Uno(){
                     setCurrentCard({suit: played_card.suit, symbol: played_card.symbol, backside: false, id: played_card.id})
                 }
 
-                //end game if a player wins
+                //#region end game if player wins
                 if(game.players[action_index].hand.length === 0){
+
+                    setPlayerHand([])
+                    game.players[0].hand.forEach(card => {
+                    setPlayerHand(playerHand => [...playerHand, <div className="card-container">
+                    <CardDisplay suit={card.suit} symbol={card.symbol} facing="down" id={card.id}/></div>])
+                    })
+
+                    setBot1Hand([])
+                    game.players[1].hand.forEach(card => {
+                    setBot1Hand(bot1Hand => [...bot1Hand, <div className="card-container">
+                    <CardDisplay suit={card.suit} symbol={card.symbol} facing="left" id={card.id}/></div>])
+                    })
+
+                    setBot2Hand([])
+                    game.players[2].hand.forEach(card => {
+                    setBot2Hand(bot2Hand => [...bot2Hand, <div className="card-container">
+                    <CardDisplay suit={card.suit} symbol={card.symbol} facing="left" id={card.id}/></div>])
+                    })
+
+                    setBot3Hand([])
+                    game.players[3].hand.forEach(card => {
+                    setBot3Hand(bot3Hand => [...bot3Hand, <div className="card-container">
+                    <CardDisplay suit={card.suit} symbol={card.symbol} facing="left" id={card.id}/></div>])
+                    })
+
                     setInfoMessage(<div><span className="player-name">{game.players[action_index].name}</span><span className="keyword"> wins!</span></div>)
                     break
                 }
+                //#endregion
 
                 switch(played_card.symbol){
                     case '⊖':
@@ -220,10 +246,8 @@ export default function Uno(){
                             let taken = take(game.deck)
                             await delay(500)
                             game.players[next_player].hand.push(taken)
+                            if(next_player === 0)sort_hand(game.players[0].hand)
                             update_hand(next_player, game.players[next_player].hand)
-
-                            sort_hand(game.players[0].hand)
-                            update_hand(0, game.players[0].hand)
                         }
                         action_index += game.turn_increment
                         break
@@ -233,10 +257,8 @@ export default function Uno(){
                             let taken = take(game.deck)
                             await delay(500)
                             game.players[next_player].hand.push(taken)
+                            if(next_player === 0)sort_hand(game.players[0].hand)
                             update_hand(next_player, game.players[next_player].hand)
-
-                            sort_hand(game.players[0].hand)
-                            update_hand(0, game.players[0].hand)
                         }
                         action_index += game.turn_increment
                         break

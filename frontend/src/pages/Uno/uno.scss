@@ -43,6 +43,11 @@
     margin: 10px;
 }
 
+#deck{
+    transition: 250ms;
+}
+
 #deck:hover{
+    transform: scale(110%);
     cursor: pointer;
 }

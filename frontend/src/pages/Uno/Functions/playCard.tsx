@@ -4,22 +4,32 @@ import { from } from "linq-to-typescript"
 
 
 const pick_suit = (hand: Card[]) => {
-    let c : any = {
-        "blue": [],
-        "red": [],
-        "green": [],
-        "yellow": []
-    }
+    let blue = 0
+    let red = 0
+    let green = 0
+    let yellow = 0
     hand.forEach(card => {
-        c[card.suit] = c[card.suit] || []
-        c[card.suit].push(card)
+        switch(card.suit){
+            case "blue":
+                blue++
+                break
+            case "green":
+                green++
+                break
+            case "red":
+                red++
+                break
+            case "yellow":
+                yellow++
+                break
+        }
     })
-    let highest_suit = "blue"
-    if(c["red"].length > c["blue"].length) highest_suit = "red"
-    if(c["green"].length > c["red"].length) highest_suit = "green"
-    if(c["yellow"].length > c["green"].length) highest_suit = "yellow"
+    let highest = "blue"
+    if(blue < green)highest = "green"
+    if(green < red)highest = "red"
+    if(red < yellow)highest = "yellow"
 
-    return highest_suit
+    return highest
 }
 
 const play_random = (hand: Card[], curr_card: Card) =>{
@@ -57,7 +67,7 @@ const play_random = (hand: Card[], curr_card: Card) =>{
 
 
 const play_optimal = (hand: Card[], curr_card: Card) =>{
-    const playable_hand = from(hand).where((x) => isPlayable(x, curr_card)).toArray()
+    const playable_hand = hand.filter((card) => isPlayable(card, curr_card))
     if(playable_hand.length == 0)return null //return null if no available cards
 
     let only_color_change = true
