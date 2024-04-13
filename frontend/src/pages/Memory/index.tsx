@@ -1,4 +1,7 @@
 import { useState } from "react"
+import GameContainer from "../../components/GameContainer"
+import './memory.scss'
+import SingleCard from "./SingleCard"
 
 const cardImages = [
     { "src": "/Images/animals/ant.png" },
@@ -57,8 +60,9 @@ const cardImages = [
 ]
 
 export default function Memory(){
-    
-    const [cards, setCards] = useState<object[]>([])
+
+    const [cards, setCards] = useState<{id: number, src: string}[]>([])
+    const [turns, setTurns] = useState(0)
 
     const shuffleCard = (amount: number) => {
 
@@ -71,7 +75,19 @@ export default function Memory(){
             .map((card) => ({ ...card, id: Math.random()}))
 
         setCards(shuffledCards)
+        setTurns(0)
     }
 
-    return <h1>Game here</h1>
+    return(
+        <>
+        <GameContainer>
+        <button onClick={() => shuffleCard(20)}>Click</button>
+        <div className="card-grid">
+            {cards.map(card => (
+                <SingleCard id={card.id} src={card.src}/>
+            ))}
+        </div>
+        </GameContainer>
+        </>
+    )
 }
