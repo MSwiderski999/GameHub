@@ -8,6 +8,7 @@ import { useState } from 'react'
 import Navbar from './components/Navbar'
 import Uno from './pages/Uno'
 import Footer from './components/Footer'
+import Memory from './pages/Memory'
 
 function App() {
   const [auth, setAuth] = useState({
@@ -23,6 +24,7 @@ function App() {
         <Route path="/register" element={<Register/>}></Route>
         <Route path="/logout" element={<Logout setAuth={setAuth} logged_in={auth.logged_in}/>}></Route>
         <Route path="/uno" element={<Uno/>}></Route>
+        <Route path="/memory" element={<Memory/>}></Route>
       </Routes>
       <Footer/>
     </BrowserRouter>
