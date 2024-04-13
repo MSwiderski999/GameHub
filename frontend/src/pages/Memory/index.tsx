@@ -1,3 +1,5 @@
+import { useState } from "react"
+
 const cardImages = [
     { "src": "/Images/animals/ant.png" },
     { "src": "/Images/animals/badger.png" },
@@ -55,5 +57,21 @@ const cardImages = [
 ]
 
 export default function Memory(){
+    
+    const [cards, setCards] = useState<object[]>([])
+
+    const shuffleCard = (amount: number) => {
+
+        const picked_cards = cardImages
+            .sort(() => Math.random() - 0.5)
+            .slice(cardImages.length - amount)
+
+        const shuffledCards = [...picked_cards, ...picked_cards]
+            .sort(() => Math.random() - 0.5)
+            .map((card) => ({ ...card, id: Math.random()}))
+
+        setCards(shuffledCards)
+    }
+
     return <h1>Game here</h1>
 }
