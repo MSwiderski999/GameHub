@@ -5,12 +5,14 @@ interface SingleCardProps{
     card: Card
     handlePick: (card: Card) => void
     flipped: boolean
-}
+    disabled: boolean}
 
 export default function SingleCard(props: SingleCardProps){
 
     const handleClick = () => {
-        props.handlePick(props.card)
+        if(!props.disabled){
+            props.handlePick(props.card)
+        }
     }
 
     return(

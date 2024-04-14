@@ -69,6 +69,8 @@ export default function Memory(){
     const [pick1, setPick1] = useState<Card | null>(null)
     const [pick2, setPick2] = useState<Card | null>(null)
 
+    const [disabled, setDisabled] = useState(false)
+
     // shuffle cards
     const shuffleCard = (amount: number) => {
 
@@ -94,11 +96,14 @@ export default function Memory(){
         setPick1(null)
         setPick2(null)
         setTurns(turns + 1)
+        setDisabled(false)
     }
 
     //compare picks
     useEffect(() => {
         if(pick1 && pick2){
+            setDisabled(true)
+            
             if(pick1.src === pick2.src){
                 setCards(prevCards => {
                     return prevCards.map(card => {
@@ -116,8 +121,6 @@ export default function Memory(){
         }
     }, [pick1, pick2])
 
-    console.log(cards)
-
     return(
         <>
         <GameContainer>
@@ -125,7 +128,13 @@ export default function Memory(){
         <Infobox><>Turns: {turns}</></Infobox>
         <div className="card-grid">
             {cards.map(card => (
-                <SingleCard key={card.id} card={card} handlePick={handlePick} flipped={card === pick1 || card === pick2 || card.matched}/>
+                <SingleCard
+                    key={card.id}
+                    card={card}
+                    handlePick={handlePick}
+                    flipped={card === pick1 || card === pick2 || card.matched}
+                    disabled={disabled}
+                />
             ))}
         </div>
         </GameContainer>
