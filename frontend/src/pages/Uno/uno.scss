@@ -1,6 +1,6 @@
 #bottom{
     position: absolute;
-    bottom: 0;
+    bottom: 11px;
     left: 20%;
     
     display: flex;
@@ -35,6 +35,9 @@
 }
 
 #center-cards{
+    position: absolute;
+    top: 38%;
+    left: 40%;
     display: flex;
     flex-direction: row;
 }
