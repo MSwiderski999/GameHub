@@ -103,7 +103,7 @@ export default function Memory(){
     useEffect(() => {
         if(pick1 && pick2){
             setDisabled(true)
-            
+
             if(pick1.src === pick2.src){
                 setCards(prevCards => {
                     return prevCards.map(card => {
@@ -116,7 +116,7 @@ export default function Memory(){
                 })
                 resetTurn()
             }else{
-                setTimeout(() => resetTurn(), 1000)
+                setTimeout(() => resetTurn(), 700)
             }
         }
     }, [pick1, pick2])

@@ -1,4 +1,5 @@
 import './singleCard.scss'
+import './backgrounds.scss'
 import { Card } from '../card'
 
 interface SingleCardProps{
@@ -18,7 +19,7 @@ export default function SingleCard(props: SingleCardProps){
     return(
         <div className="card-container">
             <div className={props.flipped ? "flipped" : ""}>
-                <div className="front"><img className="front-img" src={props.card.src} alt="card"/></div>
+                <div className={"front " + props.card.src.slice(16, -4)}><img className="front-img" src={props.card.src} alt="card"/></div>
                 <div className="back" onClick={handleClick}/>
             </div>
         </div>
