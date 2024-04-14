@@ -109,10 +109,10 @@ export default function Memory(){
                         }
                     })
                 })
+                resetTurn()
             }else{
-
+                setTimeout(() => resetTurn(), 1000)
             }
-            resetTurn()
         }
     }, [pick1, pick2])
 
@@ -125,7 +125,7 @@ export default function Memory(){
         <Infobox><>Turns: {turns}</></Infobox>
         <div className="card-grid">
             {cards.map(card => (
-                <SingleCard key={card.id} card={card} handlePick={handlePick}/>
+                <SingleCard key={card.id} card={card} handlePick={handlePick} flipped={card === pick1 || card === pick2 || card.matched}/>
             ))}
         </div>
         </GameContainer>
