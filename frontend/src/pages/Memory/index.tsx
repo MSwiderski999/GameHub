@@ -71,8 +71,10 @@ export default function Memory(){
 
     const [disabled, setDisabled] = useState(false)
 
+    const [matched, setMatched] = useState(0)
+
     // shuffle cards
-    const shuffleCard = (amount: number) => {
+    const shuffleCards = (amount: number) => {
 
         const picked_cards = cardImages
             .sort(() => Math.random() - 0.5)
@@ -82,8 +84,11 @@ export default function Memory(){
             .sort(() => Math.random() - 0.5)
             .map((card) => ({ ...card, id: Math.random()}))
 
+        setPick1(null)
+        setPick2(null)
         setCards(shuffledCards)
         setTurns(0)
+        setMatched(0)
     }
 
     //handle a pick
@@ -114,6 +119,7 @@ export default function Memory(){
                         }
                     })
                 })
+                setMatched(matched + 2)
                 resetTurn()
             }else{
                 setTimeout(() => resetTurn(), 700)
@@ -121,21 +127,32 @@ export default function Memory(){
         }
     }, [pick1, pick2])
 
+    //start the game automatically
+    useEffect(() => {
+        shuffleCards(20)
+    }, [])
+    
+
     return(
         <>
         <GameContainer>
-        <button onClick={() => shuffleCard(20)}>New game</button>
-        <Infobox><>Turns: {turns}</></Infobox>
-        <div className="card-grid">
-            {cards.map(card => (
-                <SingleCard
-                    key={card.id}
-                    card={card}
-                    handlePick={handlePick}
-                    flipped={card === pick1 || card === pick2 || card.matched}
-                    disabled={disabled}
-                />
+        <div id="info-panel">
+            <div><Infobox><>Cards matched: {matched}/40</></Infobox></div>
+            <div><button id="new-game-btn" onClick={() => shuffleCards(20)}>New game</button></div>
+            <div><Infobox><span>Turns: {turns}</span></Infobox></div>
+        </div>
+        <div id="grid-container">
+            <div className="card-grid">
+                {cards.map(card => (
+                    <SingleCard
+                        key={card.id}
+                        card={card}
+                        handlePick={handlePick}
+                        flipped={card === pick1 || card === pick2 || card.matched}
+                        disabled={disabled}
+                    />
             ))}
+        </div>
         </div>
         </GameContainer>
         </>

@@ -2,5 +2,24 @@
     margin-top: 40px;
     display: grid;
     grid-template-columns: repeat(8, 80px);
-    grid-gap: 20px
+    grid-gap: 20px;
 }
+
+#grid-container{
+    width: 100%;
+    
+    display: flex;
+    justify-content: center;
+}
+
+#info-panel{
+    width: 100%;
+    display: flex;
+}
+
+#info-panel > *{
+    width: 100%;
+}
+
+
+
