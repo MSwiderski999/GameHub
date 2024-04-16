@@ -2,7 +2,6 @@ import { useEffect, useState } from "react"
 import GameContainer from "../../components/GameContainer"
 import './memory.scss'
 import SingleCard from "./SingleCard"
-import Infobox from "../../components/InfoBox"
 import { Card } from "./card"
 
 const cardImages = [
@@ -70,8 +69,31 @@ export default function Memory(){
     const [pick2, setPick2] = useState<Card | null>(null)
 
     const [disabled, setDisabled] = useState(false)
-
     const [matched, setMatched] = useState(0)
+
+    const [seconds, setSeconds] = useState(0)
+    const [minutes, setMinutes] = useState(0)
+    const [timerRunning, setTimerRunning] = useState(false)
+
+    const resetTimer = () => {
+        setSeconds(0)
+        setMinutes(0)
+    }
+
+    useEffect(() => {
+        if(timerRunning){
+            const timer = setTimeout(() => {
+                setSeconds(seconds => seconds + 1)
+                if(seconds === 59){
+                    setMinutes(minutes + 1)
+                    setSeconds(0)
+                }
+            }, 1000)
+            return () => {
+                clearTimeout(timer)
+            }
+        }
+    },[seconds, timerRunning])
 
     // shuffle cards
     const shuffleCards = (amount: number) => {
@@ -89,11 +111,14 @@ export default function Memory(){
         setCards(shuffledCards)
         setTurns(0)
         setMatched(0)
+        resetTimer()
+        setTimerRunning(false)
     }
 
     //handle a pick
     const handlePick = (card: Card) => {
         pick1 ? setPick2(card) : setPick1(card)
+        setTimerRunning(true)
     }
 
     //reset picks and increase turn count
@@ -136,10 +161,21 @@ export default function Memory(){
     return(
         <>
         <GameContainer>
-        <div id="info-panel">
-            <div><Infobox><>Cards matched: {matched}/40</></Infobox></div>
-            <div><button id="new-game-btn" onClick={() => shuffleCards(20)}>New game</button></div>
-            <div><Infobox><span>Turns: {turns}</span></Infobox></div>
+        <div className="info-panel">
+            <div className="timer">
+                {minutes.toString().padStart(2, "0")}:{seconds.toString().padStart(2, "0")}
+            </div>
+            <div className="btn">
+                <button id="new-game-btn" onClick={() => shuffleCards(20)}>New game</button>
+            </div>
+            <div className="stats">
+                <div className="matched">
+                    Matched: {matched.toString().padStart(2, "0")}/40
+                </div>
+                <div className="turns">
+                    Turns: {turns}
+                </div>
+            </div>
         </div>
         <div id="grid-container">
             <div className="card-grid">

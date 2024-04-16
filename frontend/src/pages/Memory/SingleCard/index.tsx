@@ -6,7 +6,8 @@ interface SingleCardProps{
     card: Card
     handlePick: (card: Card) => void
     flipped: boolean
-    disabled: boolean}
+    disabled: boolean
+}
 
 export default function SingleCard(props: SingleCardProps){
 

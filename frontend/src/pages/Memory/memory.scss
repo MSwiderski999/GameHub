@@ -1,5 +1,5 @@
 .card-grid{
-    margin-top: 40px;
+    margin-top: 20px;
     display: grid;
     grid-template-columns: repeat(8, 80px);
     grid-gap: 20px;
@@ -12,13 +12,48 @@
     justify-content: center;
 }
 
-#info-panel{
-    width: 100%;
+.info-panel{
+    height: 50px;
     display: flex;
+    justify-content: space-around;
+    flex-direction: row;
 }
 
-#info-panel > *{
+.info-panel > *{
+    width: 100px;
+    height: inherit;
+    font-weight: bold;
+}
+
+.timer{
+    background-color: white;
+    line-height: 50px;
+    font-size: 30px;
+    border-radius: 5px;
+}
+
+.btn{
+    width: 150px;
+}
+
+#new-game-btn{
     width: 100%;
+    transition: all ease-in 0.1s;
+    border: 2px solid rgb(200, 200, 200);
+}
+
+#new-game-btn:hover{
+    transform: scale(1.1);
+}
+
+.stats{
+    color: white;
+    display: flex;
+    font-size: 25px;
+}
+.stats > *{
+    margin-left: 10px;
+    margin-right: 10px;
 }
 
 
