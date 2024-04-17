@@ -37,7 +37,7 @@ app.post('/login', (req, res) => {
                     return res.json({Message: err.message})
                 }
                 if (response){
-                    res.cookie('login_token', jwt.sign({id: data.id}, "jwt-secret-key"))
+                    res.cookie('login_token', jwt.sign({id: data[0].id}, "jwt-secret-key"))
                     return res.json({Status: "Success"})
                 }
                 else {
@@ -52,6 +52,7 @@ app.post('/login', (req, res) => {
 
 app.post('/logout',(req, res) => {
     res.clearCookie('login_token')
+    res.json({Status: "Success"})
 })
 
 app.post('/register', (req, res) => {

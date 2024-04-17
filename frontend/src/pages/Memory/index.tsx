@@ -3,6 +3,7 @@ import GameContainer from "../../components/GameContainer"
 import './memory.scss'
 import SingleCard from "./SingleCard"
 import { Card } from "./card"
+import axios from "axios"
 
 const cardImages = [
     { "src": "/Images/animals/ant.png", "matched": false },
@@ -145,6 +146,10 @@ export default function Memory(){
                     })
                 })
                 setMatched(matched + 2)
+                if(matched === 38){
+                    setTimerRunning(false)
+                    handleSaveScore()
+                }
                 resetTurn()
             }else{
                 setTimeout(() => resetTurn(), 700)
@@ -155,8 +160,22 @@ export default function Memory(){
     //start the game automatically
     useEffect(() => {
         shuffleCards(20)
+        handleSaveScore()
     }, [])
     
+    const handleSaveScore = () => {
+        const score = {
+            minutes: minutes,
+            seconds: seconds,
+            turns: turns
+        }
+        axios.put('http://localhost:3000/games/:2', score)
+        .then(res => {
+            if(res.status === 200){
+                alert(res)
+            }
+        })
+    }
 
     return(
         <>

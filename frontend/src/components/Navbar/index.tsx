@@ -1,16 +1,15 @@
+import { useAuth } from '../../helpers/checkAuth'
 import NavRoutes from './navRoutes'
 import './navbar.scss'
 
-interface NavbarProps{
-    auth: boolean
-}
-export default function Navbar(props: NavbarProps){
+export default function Navbar(){
+    const auth = useAuth()
     return (
         <div id="app-nav">
             <div id="app-brand">
                 GameHub
             </div>
-                <NavRoutes authStatus={props.auth}></NavRoutes>
+                <NavRoutes authStatus={auth !== undefined}></NavRoutes>
         </div>
     )
 }

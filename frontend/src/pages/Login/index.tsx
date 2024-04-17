@@ -3,16 +3,10 @@ import FormContainer from "../../components/AccountForm";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import React from "react";
+import { useAuth } from "../../helpers/checkAuth";
 
-interface LoginProps{
-    setAuth: React.Dispatch<React.SetStateAction<{
-    logged_in: boolean;
-    user: string;
-    }>>,
-    logged_in: boolean
-}
-
-export default function Login(props: LoginProps){
+export default function Login(){
+    const auth = useAuth()
     const [values, setValues] = useState({
         email: "",
         password: "",
@@ -25,11 +19,7 @@ export default function Login(props: LoginProps){
         axios.post('http://localhost:3000/login', values)
         .then(res => {
             if(res.data.Status === "Success"){
-                props.setAuth({
-                    logged_in: true,
-                    user: values.email
-                })
-                localStorage.setItem("token", values.email + "|" + values.password)
+                document.dispatchEvent(new CustomEvent("checkAuth"))
             }else {
                 alert(res.data.Message)
             }
@@ -38,7 +28,7 @@ export default function Login(props: LoginProps){
     }
 
     return (
-        !props.logged_in
+        auth === undefined
         ?
         <FormContainer>
             <form onSubmit={handleSubmit}>

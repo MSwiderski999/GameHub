@@ -1,27 +1,26 @@
-import React from "react";
 import FormContainer from "../../components/AccountForm";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { useAuth } from "../../helpers/checkAuth";
 
-interface LogoutProps{
-    setAuth: React.Dispatch<React.SetStateAction<{
-    logged_in: boolean;
-    user: string;
-    }>>,
-    logged_in: boolean
-}
+export default function Logout(){
 
-export default function Logout(props: LogoutProps){
+    const auth = useAuth()
+
     const navigate = useNavigate()
     const handleLogout = () => {
-        props.setAuth({
-            logged_in: false,
-            user: ""
+
+        axios.post("http://localhost:3000/logout")
+        .then(res => {
+            if(res.data.Status === "Success"){
+                alert('sus')
+                document.dispatchEvent(new CustomEvent("checkAuth"))
+            }
         })
-        localStorage.clear()
     }
 
     return (
-        props.logged_in
+        auth !== undefined
         ?
         <FormContainer>
             <form>
