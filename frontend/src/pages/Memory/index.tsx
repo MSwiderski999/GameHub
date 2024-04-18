@@ -6,7 +6,8 @@ import { Card } from "./card"
 import axios from "axios"
 import { useAuth } from "../../helpers/checkAuth"
 import WinMessage from "./WinMessage"
-import Leaderboard from "./Leaderboard"
+import TimeLeaderboard from "./Leaderboard/timeLeaderboard"
+import TurnsLeaderboard from "./Leaderboard/turnsLeaderboard"
 
 const cardImages = [
     { "src": "/Images/animals/ant.png", "matched": false },
@@ -89,7 +90,14 @@ export default function Memory(){
         axios.get('http://localhost:3000/memory/leaderboard/time')
             .then(res => {
                 if(res.status === 200){
-                    setTimeLeaderboard(<Leaderboard data={res.data.table}/>)
+                    setTimeLeaderboard(<TimeLeaderboard data={res.data.table}/>)
+                }
+            })
+            .catch(err => console.log(err))
+        axios.get('http://localhost:3000/memory/leaderboard/turns')
+            .then(res => {
+                if(res.status === 200){
+                    setTurnsLeaderboard(<TurnsLeaderboard data={res.data.table}/>)
                 }
             })
             .catch(err => console.log(err))
@@ -247,6 +255,7 @@ export default function Memory(){
         </div>
         {winMessage}
         {timeLeaderboard}
+        {turnsLeaderboard}
         </GameContainer>
         </>
     )

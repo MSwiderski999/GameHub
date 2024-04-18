@@ -8,10 +8,38 @@
     position: absolute;
     top: 0;
     bottom: 0;
-    left: -140px;
 
     margin: auto;
     padding: 0 10px 0 10px;
 
     height: fit-content;
+}
+
+.left{
+    left: -140px;
+}
+
+.right{
+    right: -140px;
+}
+
+h2{
+    color:aquamarine
+}
+
+.username-column{
+    text-align: left;
+}
+.score-column{
+    padding-left: 8px;
+}
+
+tr:nth-of-type(1){
+    color: gold;
+}
+tr:nth-of-type(2){
+    color: rgb(172, 172, 172);
+}
+tr:nth-of-type(3){
+    color: brown;
 }

@@ -38,13 +38,13 @@ app.get('/memory/leaderboard/time', (req, res) => {
 })
 
 app.get('/memory/leaderboard/turns', (req, res) => {
-    const sql = "SELECT SUBSTRING(score, 7) FROM gameplays"
+    const sql = "SELECT SUBSTRING(score, 7) AS turns, username FROM gameplays g JOIN accounts a ON a.id = g.account_id ORDER BY 1"
     db.query(sql, (err, data) => {
         if(err){
             res.json({Message: err.message})
         }
         else{
-            res.json({data: data})
+            res.json({table: data, status: "Success"})
         }
     })
 })
