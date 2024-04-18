@@ -25,6 +25,19 @@ const db = mysql.createConnection({
     database: "GameHub"
 })
 
+app.post('/games', (req, res) => {
+    const values = [
+        req.body.user.toString(),
+        "2",
+        `time: ${req.body.minutes}:${req.body.seconds}, turns: ${req.body.turns + 1}`
+    ]
+    const sql = `INSERT INTO gameplays(account_id, game_id, score) VALUES(?)`
+    db.query(sql, [values], (err) => {
+        if(err) res.json({Message: err})
+        else return res.json({"status": "Success"})
+    })
+})
+
 app.post('/login', (req, res) => {
     const sql = "SELECT * FROM accounts WHERE email = ?"
     db.query(sql, [req.body.email], (err, data) => {

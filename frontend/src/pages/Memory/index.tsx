@@ -1,9 +1,11 @@
-import { useEffect, useState } from "react"
+import { ReactElement, useEffect, useState } from "react"
 import GameContainer from "../../components/GameContainer"
 import './memory.scss'
 import SingleCard from "./SingleCard"
 import { Card } from "./card"
 import axios from "axios"
+import { useAuth } from "../../helpers/checkAuth"
+import WinMessage from "./WinMessage"
 
 const cardImages = [
     { "src": "/Images/animals/ant.png", "matched": false },
@@ -63,6 +65,8 @@ const cardImages = [
 
 export default function Memory(){
 
+    const auth = useAuth()
+
     const [cards, setCards] = useState<Card[]>([])
     const [turns, setTurns] = useState(0)
 
@@ -76,6 +80,7 @@ export default function Memory(){
     const [minutes, setMinutes] = useState(0)
     const [timerRunning, setTimerRunning] = useState(false)
 
+    const [winMessage, setWinMessage] = useState<ReactElement | null>(null)
     const resetTimer = () => {
         setSeconds(0)
         setMinutes(0)
@@ -114,6 +119,7 @@ export default function Memory(){
         setMatched(0)
         resetTimer()
         setTimerRunning(false)
+        setWinMessage(null)
     }
 
     //handle a pick
@@ -146,7 +152,7 @@ export default function Memory(){
                     })
                 })
                 setMatched(matched + 2)
-                if(matched === 38){
+                if(matched === 4){
                     setTimerRunning(false)
                     handleSaveScore()
                 }
@@ -159,22 +165,33 @@ export default function Memory(){
 
     //start the game automatically
     useEffect(() => {
-        shuffleCards(20)
-        handleSaveScore()
+        shuffleCards(3)
     }, [])
-    
+
+    axios.defaults.withCredentials = true
     const handleSaveScore = () => {
-        const score = {
-            minutes: minutes,
-            seconds: seconds,
-            turns: turns
-        }
-        axios.put('http://localhost:3000/games/:2', score)
-        .then(res => {
-            if(res.status === 200){
-                alert(res)
+        if(auth !== undefined){
+            const values = {
+                seconds: seconds,
+                minutes: minutes,
+                turns: turns,
+                user: auth
             }
-        })
+            axios.post('http://localhost:3000/games', values)
+            .then(res => {
+                if(res.data.status === "Success"){
+                    setTimeout(() => {
+                        setWinMessage(<div className="tinted"><WinMessage 
+                            turns={turns + 1}
+                            time={minutes.toString().padStart(2, "0")+":"+seconds.toString().padStart(2, "0")}
+                            visible={true} /></div>)
+                    }, 500)
+                }else {
+                    alert(res.data.Message)
+                }
+            })
+            .catch(err => console.log(err))
+        }
     }
 
     return(
@@ -185,7 +202,7 @@ export default function Memory(){
                 {minutes.toString().padStart(2, "0")}:{seconds.toString().padStart(2, "0")}
             </div>
             <div className="btn">
-                <button id="new-game-btn" onClick={() => shuffleCards(20)}>New game</button>
+                <button id="new-game-btn" onClick={() => shuffleCards(3)}>New game</button>
             </div>
             <div className="stats">
                 <div className="matched">
@@ -209,6 +226,7 @@ export default function Memory(){
             ))}
         </div>
         </div>
+        {winMessage}
         </GameContainer>
         </>
     )
