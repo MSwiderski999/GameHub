@@ -6,6 +6,7 @@ import { Card } from "./card"
 import axios from "axios"
 import { useAuth } from "../../helpers/checkAuth"
 import WinMessage from "./WinMessage"
+import Leaderboard from "./Leaderboard"
 
 const cardImages = [
     { "src": "/Images/animals/ant.png", "matched": false },
@@ -81,6 +82,19 @@ export default function Memory(){
     const [timerRunning, setTimerRunning] = useState(false)
 
     const [winMessage, setWinMessage] = useState<ReactElement | null>(null)
+    const [timeLeaderboard, setTimeLeaderboard] = useState<ReactElement | null>(null)
+    const [turnsLeaderboard, setTurnsLeaderboard] = useState<ReactElement | null>(null)
+
+    const pullLeaderboard = () => {
+        axios.get('http://localhost:3000/memory/leaderboard/time')
+            .then(res => {
+                if(res.status === 200){
+                    setTimeLeaderboard(<Leaderboard data={res.data.table}/>)
+                }
+            })
+            .catch(err => console.log(err))
+    }
+
     const resetTimer = () => {
         setSeconds(0)
         setMinutes(0)
@@ -104,7 +118,7 @@ export default function Memory(){
     // shuffle cards
     const shuffleCards = (amount: number) => {
 
-        const picked_cards = cardImages
+       const picked_cards = cardImages
             .sort(() => Math.random() - 0.5)
             .slice(cardImages.length - amount)
 
@@ -120,6 +134,7 @@ export default function Memory(){
         resetTimer()
         setTimerRunning(false)
         setWinMessage(null)
+        pullLeaderboard()
     }
 
     //handle a pick
@@ -152,8 +167,18 @@ export default function Memory(){
                     })
                 })
                 setMatched(matched + 2)
-                if(matched === 4){
+                if(matched === 38){
                     setTimerRunning(false)
+                    setTimeout(() => {
+                        setWinMessage(<div className="tinted">
+                            <WinMessage 
+                                turns={turns + 1}
+                                time={minutes.toString().padStart(2, "0")+":"+seconds.toString().padStart(2, "0")}
+                                visible={true}>
+                                    <button id="new-game-btn" onClick={() => shuffleCards(20)}>Play again</button>
+                            </WinMessage>
+                            </div>)
+                    }, 500)
                     handleSaveScore()
                 }
                 resetTurn()
@@ -165,28 +190,22 @@ export default function Memory(){
 
     //start the game automatically
     useEffect(() => {
-        shuffleCards(3)
+        shuffleCards(20)
+        pullLeaderboard()
     }, [])
 
     axios.defaults.withCredentials = true
     const handleSaveScore = () => {
         if(auth !== undefined){
             const values = {
-                seconds: seconds,
-                minutes: minutes,
+                seconds: seconds.toString().padStart(2, "0"),
+                minutes: minutes.toString().padStart(2, "0"),
                 turns: turns,
                 user: auth
             }
-            axios.post('http://localhost:3000/games', values)
+            axios.post('http://localhost:3000/memory', values)
             .then(res => {
-                if(res.data.status === "Success"){
-                    setTimeout(() => {
-                        setWinMessage(<div className="tinted"><WinMessage 
-                            turns={turns + 1}
-                            time={minutes.toString().padStart(2, "0")+":"+seconds.toString().padStart(2, "0")}
-                            visible={true} /></div>)
-                    }, 500)
-                }else {
+                if(res.data.status !== "Success"){
                     alert(res.data.Message)
                 }
             })
@@ -202,7 +221,7 @@ export default function Memory(){
                 {minutes.toString().padStart(2, "0")}:{seconds.toString().padStart(2, "0")}
             </div>
             <div className="btn">
-                <button id="new-game-btn" onClick={() => shuffleCards(3)}>New game</button>
+                <button id="new-game-btn" onClick={() => shuffleCards(20)}>New game</button>
             </div>
             <div className="stats">
                 <div className="matched">
@@ -227,6 +246,7 @@ export default function Memory(){
         </div>
         </div>
         {winMessage}
+        {timeLeaderboard}
         </GameContainer>
         </>
     )

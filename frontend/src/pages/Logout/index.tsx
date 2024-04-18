@@ -13,7 +13,6 @@ export default function Logout(){
         axios.post("http://localhost:3000/logout")
         .then(res => {
             if(res.data.Status === "Success"){
-                alert('sus')
                 document.dispatchEvent(new CustomEvent("checkAuth"))
             }
         })
