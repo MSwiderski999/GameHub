@@ -13,9 +13,13 @@ import './uno.scss'
 import { getName } from "../../helpers/getBotName";
 import { pick_suit, play_random, play_mixed, play_optimal } from "./Functions/playCard";
 import Infobox from "../../components/InfoBox";
+import { useAuth } from "../../helpers/checkAuth";
+import axios from "axios";
 
 export default function Uno(){
     //#region general hooks
+    const auth = useAuth()
+    const [username, setUsername] = useState<string>("Guest")
 
     const [active, setActive] = useState(false)
 
@@ -29,6 +33,18 @@ export default function Uno(){
         id: -1
     })
 
+    const handleUsername = () => {
+        axios.defaults.withCredentials = true
+        const url = "http://localhost:3000/accounts/" + auth
+        axios.post(url)
+            .then(res => {
+                if(res.status === 200){
+                    setUsername(res.data.toString())
+                }
+            })
+            .catch(err => console.log(err))
+    }
+
     const [botNames] = useState([getName(), getName(), getName()])
 
     const [playerHand, setPlayerHand] = useState(new Array<ReactElement>)
@@ -40,8 +56,9 @@ export default function Uno(){
 
     let action_index = Math.floor(Math.random() * 4)
     //#endregion
-    
-    useEffect(() => () => setActive(false), [])
+    useEffect(() => () => {
+        setActive(false)
+    }, [])
 
     //#region add card to hand
     const add_to_hand = (action_index: number, card: Card) => {
@@ -111,7 +128,7 @@ export default function Uno(){
         const game: Game = {
             gamesTotal: 0,
             gamesPlayed: 0,
-            players: [{name: "Guest", hand: [], ai: false}, {name: botNames[0], hand: [], ai: true}, {name: botNames[1], hand: [], ai: true}, {name: botNames[2], hand: [], ai: true}],
+            players: [{name: "Player", hand: [], ai: false}, {name: botNames[0], hand: [], ai: true}, {name: botNames[1], hand: [], ai: true}, {name: botNames[2], hand: [], ai: true}],
             current_card: take(temp_deck),
             deck: temp_deck,
             turn_increment: 1
@@ -166,7 +183,7 @@ export default function Uno(){
         //#endregion
 
         let used_cards : Card[] = []
-
+        game.players[0].name = username
         //#region game loop
         while(game.players[action_index].hand.length > 0){
             let next_player = (action_index + game.turn_increment) % 4
@@ -284,7 +301,7 @@ export default function Uno(){
         ?
         <GameContainer>
             <div id="bottom">
-            <div id="bottom-tag"><PlayerTag photoSrc="../../../public/Images/guest.png" playerName="Guest"/></div>
+            <div id="bottom-tag"><PlayerTag photoSrc="../../../public/Images/guest.png" playerName={username}/></div>
             <div id="bottom-hand"><Hand player>{playerHand}</Hand></div></div>
 
             <div id="left">
@@ -307,7 +324,10 @@ export default function Uno(){
             <Infobox>{infoMessage}</Infobox>
         </GameContainer>
         :
-        <GameForm onSubmit={async () => StartGame()}>
+        <GameForm onSubmit={async () => {
+            StartGame()
+            handleUsername()
+        }}>
             <>
             <p className="input-label">Difficulty</p>
             <div className="multiple-choice-container">

@@ -5,7 +5,6 @@ interface LeaderboardProps{
 }
 
 export default function TurnsLeaderboard(props: LeaderboardProps){
-    console.log(props.data)
     return(
          <div className="leaderboard right">
             <h2>Top scores by turns</h2>

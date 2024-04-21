@@ -25,6 +25,17 @@ const db = mysql.createConnection({
     database: "GameHub"
 })
 
+app.post('/accounts/:id', (req, res) => {
+    const sql = "SELECT username AS username FROM accounts WHERE id = ?"
+    const values = [req.params.id]
+    db.query(sql, values, (err, data) => {
+        if(err) res.json({Message: err})
+        else if(data.length > 0){
+            res.status(200)
+            res.send(data[0].username)
+        }
+    })
+})
 app.get('/memory/leaderboard/time', (req, res) => {
     const sql = "SELECT SUBSTRING(score, 1, 2) AS minutes, SUBSTRING(score, 4, 2) AS seconds, username FROM gameplays g JOIN accounts a ON a.id = g.account_id ORDER BY 1, 2"
     db.query(sql, (err, data) => {

@@ -5,7 +5,6 @@ interface LeaderboardProps{
 }
 
 export default function TimeLeaderboard(props: LeaderboardProps){
-    console.log(props.data)
     return(
          <div className="leaderboard left">
             <h2>Top scores by time</h2>
