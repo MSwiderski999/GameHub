@@ -14,14 +14,17 @@ const colors = [
 
 export default function CandyCrush() {
     const [colorArrangement, setColorArrangement] = useState<string[]>([])
+    const [draggedTile, setDraggedTile] = useState<any>(null)
+    const [replacedTile, setReplacedTile] = useState<any>(null)
 
     const checkForColumnOfFour = () => {
-        for (let i = 0; i < 60; i++) {
+        for (let i = 0; i <= 53; i++) {
             const columnOfFour: number[] = [i, i + width, i + width * 2, i + width * 3]
             const decidedColor: string = colorArrangement[i]
 
             if (columnOfFour.every(cell => colorArrangement[cell] === decidedColor)) {
                 columnOfFour.forEach(cell => colorArrangement[cell] = "")
+                return true
             }
         }
     }
@@ -36,17 +39,19 @@ export default function CandyCrush() {
 
             if (rowOfFour.every(cell => colorArrangement[cell] === decidedColor)) {
                 rowOfFour.forEach(cell => colorArrangement[cell] = "")
+                return true
             }
         }
     }
 
     const checkForColumnOfThree = () => {
-        for (let i = 0; i < 69; i++) {
+        for (let i = 0; i <= 62; i++) {
             const columnOfThree: number[] = [i, i + width, i + width * 2]
             const decidedColor: string = colorArrangement[i]
 
             if (columnOfThree.every(cell => colorArrangement[cell] === decidedColor)) {
                 columnOfThree.forEach(cell => colorArrangement[cell] = "")
+                return true
             }
         }
     }
@@ -61,16 +66,64 @@ export default function CandyCrush() {
 
             if (rowOfThree.every(cell => colorArrangement[cell] === decidedColor)) {
                 rowOfThree.forEach(cell => colorArrangement[cell] = "")
+                return true
             }
         }
     }
 
     const moveBelow = () => {
-        for (let i = 0; i < 81 - width; i++) {
+        for (let i = 0; i <= 71; i++) {
+            if (i <= 8 && colorArrangement[i] === "") {
+                let randomColor = Math.floor(Math.random() * colors.length)
+                colorArrangement[i] = colors[randomColor]
+            }
             if (colorArrangement[i + width] === "") {
                 colorArrangement[i + width] = colorArrangement[i]
                 colorArrangement[i] = ""
             }
+        }
+    }
+
+    const dragStart = (e: { target: any }) => {
+        setDraggedTile(e.target)
+    }
+
+    const dragDrop = (e: { target: any }) => {
+        setReplacedTile(e.target)
+    }
+
+    const dragEnd = () => {
+        const draggedId = parseInt(draggedTile.getAttribute("data-id"))
+        const replacedId = parseInt(replacedTile.getAttribute("data-id"))
+
+        colorArrangement[replacedId] = draggedTile.style.backgroundColor
+        colorArrangement[draggedId] = replacedTile.style.backgroundColor
+
+        const validMoves = [
+            draggedId - 1,
+            draggedId - width,
+            draggedId + 1,
+            draggedId + width
+        ]
+
+        const validMove = validMoves.includes(replacedId)
+
+        const columnOfFour = checkForColumnOfFour()
+        const rowOfFour = checkForRowOfFour()
+        const columnOfThree = checkForColumnOfThree()
+        const rowOfThree = checkForRowOfThree()
+
+        if (replacedId
+            && validMove
+            && (columnOfFour || rowOfFour || columnOfThree || rowOfThree)) {
+                setDraggedTile(null)
+                setReplacedTile(null)
+        }
+        else {
+            colorArrangement[replacedId] = replacedTile.style.backgroundColor
+            colorArrangement[draggedId] = draggedTile.style.backgroundColor
+
+            setColorArrangement([...colorArrangement])
         }
     }
 
@@ -108,6 +161,14 @@ export default function CandyCrush() {
                             key={index}
                             style={{backgroundColor: color}}
                             alt={color}
+                            data-id={index}
+                            draggable={true}
+                            onDragStart={dragStart}
+                            onDragOver={(e) => e.preventDefault()}
+                            onDragEnter={(e) => e.preventDefault()}
+                            onDragLeave={(e) => e.preventDefault()}
+                            onDrop={dragDrop}
+                            onDragEnd={dragEnd}
                         />
                     ))}
                 </div>
