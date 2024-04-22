@@ -8,6 +8,7 @@ import Navbar from './components/Navbar'
 import Uno from './pages/Uno'
 import Footer from './components/Footer'
 import Memory from './pages/Memory'
+import CandyCrush from './pages/CandyCrush'
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         <Route path="/logout" element={<Logout/>}></Route>
         <Route path="/uno" element={<Uno/>}></Route>
         <Route path="/memory" element={<Memory/>}></Route>
+        <Route path="/candy-crush" element={<CandyCrush/>}></Route>
       </Routes>
       <Footer/>
     </BrowserRouter>

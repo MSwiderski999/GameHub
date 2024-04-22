@@ -5,6 +5,7 @@ export default function Home(){
         <>
         <Thumbnail name={"Uno"} imgsrc="../../../public/Images/uno-thumbnail.jpg" url="/uno"/>
         <Thumbnail name={"Memory"} imgsrc="../../../public/Images/memory-thumbnail.png" url="/memory"/>
+        <Thumbnail name={"Candy Crush"} url="/candy-crush"/>
         </>
     )
 }
