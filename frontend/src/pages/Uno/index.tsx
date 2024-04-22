@@ -1,3 +1,4 @@
+//#region imports
 import { ReactElement, useEffect, useState } from "react";
 import GameForm from "../../components/GameForm";
 import CardDisplay from "./CardDisplay";
@@ -15,11 +16,13 @@ import { pick_suit, play_random, play_mixed, play_optimal } from "./Functions/pl
 import Infobox from "../../components/InfoBox";
 import { useAuth } from "../../helpers/checkAuth";
 import axios from "axios";
+import { isPlayable } from "./Functions/isPlayable";
+//#endregion
 
 export default function Uno(){
-    //#region general hooks
+    //#region hooks
     const auth = useAuth()
-    const [username, setUsername] = useState<string>("Guest")
+    const [username, setUsername] = useState<string>("Player")
 
     const [active, setActive] = useState(false)
 
@@ -33,6 +36,23 @@ export default function Uno(){
         id: -1
     })
 
+    const [botNames] = useState([getName(), getName(), getName()])
+
+    const [playerHand, setPlayerHand] = useState(new Array<ReactElement>)
+    const [bot1Hand, setBot1Hand] = useState(new Array<ReactElement>)
+    const [bot2Hand, setBot2Hand] = useState(new Array<ReactElement>)
+    const [bot3Hand, setBot3Hand] = useState(new Array<ReactElement>)
+
+    const [infoMessage, setInfoMessage] = useState(<div>Good luck!</div>)
+
+    useEffect(() => () => {
+        setActive(false)
+    }, [])
+
+    const delay = (ms: number | undefined) => new Promise(res => setTimeout(res, ms)) //delay for smooth animation
+    //#endregion
+
+    //#region get username function
     const handleUsername = () => {
         axios.defaults.withCredentials = true
         const url = "http://localhost:3000/accounts/" + auth
@@ -44,21 +64,28 @@ export default function Uno(){
             })
             .catch(err => console.log(err))
     }
-
-    const [botNames] = useState([getName(), getName(), getName()])
-
-    const [playerHand, setPlayerHand] = useState(new Array<ReactElement>)
-    const [bot1Hand, setBot1Hand] = useState(new Array<ReactElement>)
-    const [bot2Hand, setBot2Hand] = useState(new Array<ReactElement>)
-    const [bot3Hand, setBot3Hand] = useState(new Array<ReactElement>)
-
-    const [infoMessage, setInfoMessage] = useState(<div>Good luck!</div>)
-
-    let action_index = Math.floor(Math.random() * 4)
     //#endregion
-    useEffect(() => () => {
-        setActive(false)
-    }, [])
+
+    //#region handle player's move
+    const handlePlay = (id: number) => {
+        const targetCard = game.players[0].hand.filter((card) => {
+            return card.id === id
+        })[0]
+        if(isPlayable(targetCard, game.current_card)){
+            setCurrentCard({suit: targetCard.suit, symbol: targetCard.symbol, backside: false, id: targetCard.id})
+            game.players[0].hand = game.players[0].hand.filter((card) => {
+                return card.id !== targetCard.id
+            })
+            update_hand(0, game.players[0].hand)
+        }
+    }
+    //#endregion
+
+    //#region declaring game variables
+    let action_index = Math.floor(Math.random() * 4)
+    let game: Game
+    let play: (hand: Card[], curr_card: Card) => number | null
+    //#endregion
 
     //#region add card to hand
     const add_to_hand = (action_index: number, card: Card) => {
@@ -85,12 +112,11 @@ export default function Uno(){
 
     //#region update hand
     const update_hand = (action_index: number, hand: Card[]) => {
-        console.log(action_index)
         switch(action_index % 4){
             case 0:
                 setPlayerHand([])
                 hand.forEach(card => {
-                    setPlayerHand(playerHand => [...playerHand, <div className="card-container">
+                    setPlayerHand(playerHand => [...playerHand, <div className="card-container" onClick={() => handlePlay(card.id)}>
                     <CardDisplay suit={card.suit} symbol={card.symbol} facing="down" id={card.id}/></div>])
                 })
                 break
@@ -119,13 +145,10 @@ export default function Uno(){
     }
     //#endregion
 
-    const StartGame = async () =>{
-        setActive(true)
-        const delay = (ms: number | undefined) => new Promise(res => setTimeout(res, ms)) //delay for smooth animation
-
-        //#region create a game object
+    //#region initiating game and play function
+    const buildGame = () => {
         let temp_deck = shuffle(Deck)
-        const game: Game = {
+        game = {
             gamesTotal: 0,
             gamesPlayed: 0,
             players: [{name: "Player", hand: [], ai: false}, {name: botNames[0], hand: [], ai: true}, {name: botNames[1], hand: [], ai: true}, {name: botNames[2], hand: [], ai: true}],
@@ -133,7 +156,9 @@ export default function Uno(){
             deck: temp_deck,
             turn_increment: 1
         }
-        let play
+    }
+
+    const buildPlayFunction = () => {
         if(difficulty === "easy"){
             play = (hand: Card[], curr_card: Card) => {
                 return play_random(hand, curr_card)
@@ -149,9 +174,11 @@ export default function Uno(){
                 return play_optimal(hand, curr_card)
             }
         }
-        //#endregion
+    }
+    //#endregion
 
-        //#region distributing cards
+    //#region distribute cards
+    const distributeCards = async () => {
         for(let i = 0; i < 28; i++){
             const taken : Card = take(game.deck)
             await delay(35)
@@ -180,11 +207,32 @@ export default function Uno(){
                     break
             }
         }
+    }
+    //#endregion
+    //#region bots play loop
+    const botPlayLoop = () => {
+        
+    }
+    //#endregion
+    
+    const StartGame = async () =>{
+        setActive(true)
+
+        //#region create a game object
+        buildGame()
+        buildPlayFunction()
         //#endregion
 
+        //distribute starting 7 cards
+        await distributeCards()
+
+        //declare array of already played cards
         let used_cards : Card[] = []
+
+        //assign player's name to the game object
         game.players[0].name = username
         //#region game loop
+        
         while(game.players[action_index].hand.length > 0){
             let next_player = (action_index + game.turn_increment) % 4
 
