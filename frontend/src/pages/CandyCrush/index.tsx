@@ -1,15 +1,22 @@
 import { useEffect, useState } from "react"
 import "./candy-crush.scss"
 import GameContainer from "../../components/GameContainer"
+import blue from "../../../public/Images/candy/blue-candy.png"
+import green from "../../../public/Images/candy/green-candy.png"
+import orange from "../../../public/Images/candy/orange-candy.png"
+import purple from "../../../public/Images/candy/purple-candy.png"
+import red from "../../../public/Images/candy/red-candy.png"
+import yellow from "../../../public/Images/candy/yellow-candy.png"
+import blank from "../../../public/Images/candy/blank.png"
 
 const width = 9
 const colors = [
-    "blue", 
-    "green",
-    "orange",
-    "purple",
-    "red",
-    "yellow"
+    blue, 
+    green,
+    orange,
+    purple,
+    red,
+    yellow
 ]
 
 export default function CandyCrush() {
@@ -23,7 +30,7 @@ export default function CandyCrush() {
             const decidedColor: string = colorArrangement[i]
 
             if (columnOfFour.every(cell => colorArrangement[cell] === decidedColor)) {
-                columnOfFour.forEach(cell => colorArrangement[cell] = "")
+                columnOfFour.forEach(cell => colorArrangement[cell] = blank)
                 return true
             }
         }
@@ -38,7 +45,7 @@ export default function CandyCrush() {
             if (notValid.includes(i)) continue
 
             if (rowOfFour.every(cell => colorArrangement[cell] === decidedColor)) {
-                rowOfFour.forEach(cell => colorArrangement[cell] = "")
+                rowOfFour.forEach(cell => colorArrangement[cell] = blank)
                 return true
             }
         }
@@ -50,7 +57,7 @@ export default function CandyCrush() {
             const decidedColor: string = colorArrangement[i]
 
             if (columnOfThree.every(cell => colorArrangement[cell] === decidedColor)) {
-                columnOfThree.forEach(cell => colorArrangement[cell] = "")
+                columnOfThree.forEach(cell => colorArrangement[cell] = blank)
                 return true
             }
         }
@@ -65,7 +72,7 @@ export default function CandyCrush() {
             if (notValid.includes(i)) continue
 
             if (rowOfThree.every(cell => colorArrangement[cell] === decidedColor)) {
-                rowOfThree.forEach(cell => colorArrangement[cell] = "")
+                rowOfThree.forEach(cell => colorArrangement[cell] = blank)
                 return true
             }
         }
@@ -73,13 +80,13 @@ export default function CandyCrush() {
 
     const moveBelow = () => {
         for (let i = 0; i <= 71; i++) {
-            if (i <= 8 && colorArrangement[i] === "") {
+            if (i <= 8 && colorArrangement[i] === blank) {
                 let randomColor = Math.floor(Math.random() * colors.length)
                 colorArrangement[i] = colors[randomColor]
             }
-            if (colorArrangement[i + width] === "") {
+            if (colorArrangement[i + width] === blank) {
                 colorArrangement[i + width] = colorArrangement[i]
-                colorArrangement[i] = ""
+                colorArrangement[i] = blank
             }
         }
     }
@@ -96,8 +103,8 @@ export default function CandyCrush() {
         const draggedId = parseInt(draggedTile.getAttribute("data-id"))
         const replacedId = parseInt(replacedTile.getAttribute("data-id"))
 
-        colorArrangement[replacedId] = draggedTile.style.backgroundColor
-        colorArrangement[draggedId] = replacedTile.style.backgroundColor
+        colorArrangement[replacedId] = draggedTile.getAttribute('src')
+        colorArrangement[draggedId] = replacedTile.getAttribute('src')
 
         const validMoves = [
             draggedId - 1,
@@ -120,8 +127,8 @@ export default function CandyCrush() {
                 setReplacedTile(null)
         }
         else {
-            colorArrangement[replacedId] = replacedTile.style.backgroundColor
-            colorArrangement[draggedId] = draggedTile.style.backgroundColor
+            colorArrangement[replacedId] = replacedTile.getAttribute('src')
+            colorArrangement[draggedId] = draggedTile.getAttribute('src')
 
             setColorArrangement([...colorArrangement])
         }
@@ -159,7 +166,7 @@ export default function CandyCrush() {
                     {colorArrangement.map((color, index) => (
                         <img
                             key={index}
-                            style={{backgroundColor: color}}
+                            src={color}
                             alt={color}
                             data-id={index}
                             draggable={true}
