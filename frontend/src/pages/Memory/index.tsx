@@ -213,6 +213,7 @@ export default function Memory(){
             }
             axios.post('http://localhost:3000/memory', values)
             .then(res => {
+                console.log(res.data)
                 if(res.data.status !== "Success"){
                     alert(res.data.Message)
                 }

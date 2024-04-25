@@ -23,6 +23,97 @@
     border-radius: 0;
 }
 
+.scoreboard-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+}
+
 .scoreboard {
-    width: max-content;
+    width: 120px;
+    border-radius: 5px;
+    margin: 5px;
+    padding: 5px;
+}
+
+.game-over-message{
+    background-color: rgba(255, 213, 0, 1);
+    color: rgba(11, 0, 26, 1);
+
+    width: 200px;
+    height: 250px;
+    padding: 10px;
+
+    border-radius: 10px;
+
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto auto auto auto;
+
+    animation: flow-in 0.2s ease-in;
+    animation: rgb 6s linear infinite;
+}
+
+p{
+    font-size: 25px;
+    font-weight: bold;
+}
+
+@keyframes tint{
+    0%{
+        opacity: 0;
+    }
+    100%{
+        opacity: 1;
+    }
+}
+
+@keyframes rgb {
+    0%{
+        background-color: orange;
+    }
+    10%{
+        background-color: rgb(250, 31, 31);
+    }
+    20%{
+        background-color: rgb(146, 5, 85);
+    }
+    30%{
+        background-color: magenta;
+    }
+    40%{
+        background-color: blueviolet;
+    }
+    50%{
+        background-color: rgb(38, 35, 252);
+    }
+    60%{
+        background-color: rgb(1, 173, 173);
+    }
+    70%{
+        background-color: rgb(3, 193, 3);
+    }
+    80%{
+        background-color: greenyellow;
+    }
+    90%{
+        background-color: yellow;
+    }
+    100%{
+        background-color: orange
+    }
+}
+
+.tinted{
+    background-color: rgba(0, 0, 0, 0.5);
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    animation: tint 0.5s;
 }

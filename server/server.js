@@ -37,7 +37,7 @@ app.post('/accounts/:id', (req, res) => {
     })
 })
 app.get('/memory/leaderboard/time', (req, res) => {
-    const sql = "SELECT SUBSTRING(score, 1, 2) AS minutes, SUBSTRING(score, 4, 2) AS seconds, username FROM gameplays g JOIN accounts a ON a.id = g.account_id ORDER BY 1, 2"
+    const sql = "SELECT SUBSTRING(score, 1, 2) AS minutes, SUBSTRING(score, 4, 2) AS seconds, username FROM gameplays g JOIN accounts a ON a.id = g.account_id WHERE g.game_id = 2 ORDER BY 1, 2 LIMIT 10"
     db.query(sql, (err, data) => {
         if(err){
             res.json({Message: err.message})
@@ -49,7 +49,7 @@ app.get('/memory/leaderboard/time', (req, res) => {
 })
 
 app.get('/memory/leaderboard/turns', (req, res) => {
-    const sql = "SELECT SUBSTRING(score, 7) AS turns, username FROM gameplays g JOIN accounts a ON a.id = g.account_id ORDER BY 1"
+    const sql = "SELECT SUBSTRING(score, 7) AS turns, username FROM gameplays g JOIN accounts a ON a.id = g.account_id WHERE g.game_id = 2 ORDER BY 1 LIMIT 10"
     db.query(sql, (err, data) => {
         if(err){
             res.json({Message: err.message})
@@ -69,6 +69,32 @@ app.post('/memory', (req, res) => {
     const sql = `INSERT INTO gameplays(account_id, game_id, score) VALUES(?)`
     db.query(sql, [values], (err) => {
         if(err) res.json({Message: err})
+        else return res.json({"status": "Success"})
+    })
+})
+
+app.get('/candy-crush/leaderboard', (req, res) => {
+    const sql = "SELECT username AS username, score AS score FROM accounts a JOIN gameplays g ON a.id = g.account_id WHERE g.game_id = 3 ORDER BY 2 DESC, 1 LIMIT 10"
+    db.query(sql, (err, data) => {
+        if (err) {
+            res.json({Message: err.message})
+        }
+        else {
+            res.json({table: data, status: "Success"})
+        }
+    })
+})
+
+app.post('/candy-crush', (req, res) => {
+    const values = [
+        req.body.user.toString(),
+        "3",
+        req.body.score
+    ]
+    const sql = `INSERT INTO gameplays(account_id, game_id, score) VALUES(?)`
+
+    db.query(sql, [values], (err) => {
+        if (err) res.json({Message: err})
         else return res.json({"status": "Success"})
     })
 })

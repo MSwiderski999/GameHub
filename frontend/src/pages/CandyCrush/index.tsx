@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { ReactElement, useEffect, useState } from "react"
 import "./candy-crush.scss"
 import GameContainer from "../../components/GameContainer"
 import blue from "../../../public/Images/candy/blue-candy.png"
@@ -9,6 +9,9 @@ import red from "../../../public/Images/candy/red-candy.png"
 import yellow from "../../../public/Images/candy/yellow-candy.png"
 import blank from "../../../public/Images/candy/blank.png"
 import { findValidMoves } from "./findValidMoves"
+import { useAuth } from "../../helpers/checkAuth"
+import axios from "axios"
+import ScoreLeaderboard from "./ScoreLeaderboard"
 
 const width = 9
 const colors = [
@@ -21,6 +24,8 @@ const colors = [
 ]
 
 export default function CandyCrush() {
+    const auth = useAuth()
+
     const [colorArrangement, setColorArrangement] = useState<string[]>([])
     const [tilesToRemove] = useState<boolean[]>([])
     const [draggedTile, setDraggedTile] = useState<any>(null)
@@ -32,6 +37,35 @@ export default function CandyCrush() {
     const [minutes, setMinutes] = useState(0)
     const [timerRunning, setTimerRunning] = useState(false)
 
+    const [gameOverMessage, setGameOverMessage] = useState<ReactElement | null>(null)
+    const [leaderboard, setLeaderboard] = useState<ReactElement | null>(null)
+
+    const pullLeaderboard = () => {
+        axios.get('http://localhost:3000/candy-crush/leaderboard')
+            .then(res => {
+                if(res.status === 200){
+                    setLeaderboard(<ScoreLeaderboard data={res.data.table}/>)
+                }
+            })
+            .catch(err => console.log(err))
+    }
+
+    const handleSaveScore = () => {
+        if (auth !== undefined) {
+            const values = {
+                user: auth,
+                score: points
+            }
+
+            axios.post('http://localhost:3000/candy-crush', values)
+                .then(res => {
+                    if (res.data.status !== "Success") {
+                        alert(res.data.Message)
+                    }
+                })
+                .catch(err => console.log(err))
+        }
+    }
     const resetTimer = () => {
         setSeconds(0)
         setMinutes(2)
@@ -47,6 +81,14 @@ export default function CandyCrush() {
                 }
                 if (seconds === 1 && minutes === 0) {
                     setTimerRunning(false)
+
+                    setGameOverMessage(<div className="tinted"><div className="game-over-message">
+                        <h1>Time's up!</h1>
+                        <p>Score: {points}</p>
+                        <button onClick={createBoard}>Play again</button>
+                    </div></div>)
+
+                    handleSaveScore()
                 }
             }, 1000)
             return () => {
@@ -68,6 +110,10 @@ export default function CandyCrush() {
 
         resetTimer()
         setTimerRunning(false)
+
+        setGameOverMessage(null)
+
+        pullLeaderboard()
     }
 
     const checkForVerticalMatches = () => {
@@ -143,7 +189,6 @@ export default function CandyCrush() {
 
     const dragStart = (e: { target: any }) => {
         setDraggedTile(e.target)
-        setGameBegan(true)
         setTimerRunning(true)
     }
 
@@ -152,6 +197,8 @@ export default function CandyCrush() {
     }
 
     const dragEnd = () => {
+        setGameBegan(true)
+
         const draggedId = parseInt(draggedTile.getAttribute("data-id"))
         const replacedId = parseInt(replacedTile.getAttribute("data-id"))
 
@@ -202,9 +249,10 @@ export default function CandyCrush() {
 
     return (
         <GameContainer>
-            <div>
+            <div className="scoreboard-container">
                 <h1 className="scoreboard">{points}</h1>
                 <h1 className="scoreboard">{minutes.toString().padStart(2, "0")}:{seconds.toString().padStart(2, "0")}</h1>
+                <button className="scoreboard new-game-btn" onClick={createBoard}>New game</button>
             </div>
             <div className="candy-crush">
                 <div className="board">
@@ -225,6 +273,8 @@ export default function CandyCrush() {
                     ))}
                 </div>
             </div>
+            {gameOverMessage}
+            {leaderboard}
         </GameContainer>
     )
 }
