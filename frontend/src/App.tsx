@@ -9,6 +9,7 @@ import Uno from './pages/Uno'
 import Footer from './components/Footer'
 import Memory from './pages/Memory'
 import CandyCrush from './pages/CandyCrush'
+import Test from './pages/Test'
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
         <Route path="/uno" element={<Uno/>}></Route>
         <Route path="/memory" element={<Memory/>}></Route>
         <Route path="/candy-crush" element={<CandyCrush/>}></Route>
+        <Route path="/test" element={<Test/>}></Route>
       </Routes>
       <Footer/>
     </BrowserRouter>
