@@ -28,6 +28,33 @@ export default function CandyCrush() {
     const [points, setPoints] = useState<number>(0)
     const [gameBegan, setGameBegan] = useState<boolean>(false)
 
+    const [seconds, setSeconds] = useState(0)
+    const [minutes, setMinutes] = useState(0)
+    const [timerRunning, setTimerRunning] = useState(false)
+
+    const resetTimer = () => {
+        setSeconds(0)
+        setMinutes(2)
+    }
+
+    useEffect(() => {
+        if(timerRunning){
+            const timer = setTimeout(() => {
+                setSeconds(seconds => seconds - 1)
+                if(seconds === 0){
+                    setMinutes(minutes - 1)
+                    setSeconds(59)
+                }
+                if (seconds === 1 && minutes === 0) {
+                    setTimerRunning(false)
+                }
+            }, 1000)
+            return () => {
+                clearTimeout(timer)
+            }
+        }
+    },[seconds, timerRunning])
+
     const createBoard = () => {
         const randomColorArrangement = []
         for (let i = 0; i < width * width; i++) {
@@ -38,6 +65,9 @@ export default function CandyCrush() {
         setColorArrangement(randomColorArrangement)
         setPoints(0)
         setGameBegan(false)
+
+        resetTimer()
+        setTimerRunning(false)
     }
 
     const checkForVerticalMatches = () => {
@@ -114,6 +144,7 @@ export default function CandyCrush() {
     const dragStart = (e: { target: any }) => {
         setDraggedTile(e.target)
         setGameBegan(true)
+        setTimerRunning(true)
     }
 
     const dragDrop = (e: { target: any }) => {
@@ -171,7 +202,10 @@ export default function CandyCrush() {
 
     return (
         <GameContainer>
-            <h1 className="scoreboard">{points}</h1>
+            <div>
+                <h1 className="scoreboard">{points}</h1>
+                <h1 className="scoreboard">{minutes.toString().padStart(2, "0")}:{seconds.toString().padStart(2, "0")}</h1>
+            </div>
             <div className="candy-crush">
                 <div className="board">
                     {colorArrangement.map((tile, index) => (

@@ -21,12 +21,6 @@
     width: 65px;
     height: 65px;
     border-radius: 0;
-
-    animation: fall 100ms ease-in;
-    @keyframes fall {
-        0% { transform: translateY(-65px); }
-        100% { transform: translateY(0); }
-    }
 }
 
 .scoreboard {
