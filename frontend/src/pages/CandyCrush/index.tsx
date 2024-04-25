@@ -25,6 +25,8 @@ export default function CandyCrush() {
     const [tilesToRemove] = useState<boolean[]>([])
     const [draggedTile, setDraggedTile] = useState<any>(null)
     const [replacedTile, setReplacedTile] = useState<any>(null)
+    const [points, setPoints] = useState<number>(0)
+    const [gameBegan, setGameBegan] = useState<boolean>(false)
 
     const createBoard = () => {
         const randomColorArrangement = []
@@ -34,6 +36,8 @@ export default function CandyCrush() {
             tilesToRemove[i] = false
         }
         setColorArrangement(randomColorArrangement)
+        setPoints(0)
+        setGameBegan(false)
     }
 
     const checkForVerticalMatches = () => {
@@ -70,6 +74,9 @@ export default function CandyCrush() {
     }
 
     const removeTiles = () => {
+        if (gameBegan) {
+            setPoints(points + tilesToRemove.filter(tile => tile).length)
+        }
         tilesToRemove.forEach((tile, index) => {
             if (tile) {
                 colorArrangement[index] = blank
@@ -106,6 +113,7 @@ export default function CandyCrush() {
 
     const dragStart = (e: { target: any }) => {
         setDraggedTile(e.target)
+        setGameBegan(true)
     }
 
     const dragDrop = (e: { target: any }) => {
@@ -116,12 +124,14 @@ export default function CandyCrush() {
         const draggedId = parseInt(draggedTile.getAttribute("data-id"))
         const replacedId = parseInt(replacedTile.getAttribute("data-id"))
 
-        colorArrangement[replacedId] = draggedTile.getAttribute('src')
-        colorArrangement[draggedId] = replacedTile.getAttribute('src')
-
         const validMoves = findValidMoves(draggedId, width)
 
         const validMove = validMoves.includes(replacedId)
+
+        if (validMove) {
+            colorArrangement[replacedId] = draggedTile.getAttribute('src')
+            colorArrangement[draggedId] = replacedTile.getAttribute('src')
+        }
 
         const verticalMatch = checkForVerticalMatches()
         const horizontalMatch = checkForHorizontalMatches()
@@ -132,7 +142,7 @@ export default function CandyCrush() {
                 setDraggedTile(null)
                 setReplacedTile(null)
         }
-        else {
+        else if (validMove) {
             colorArrangement[replacedId] = replacedTile.getAttribute('src')
             colorArrangement[draggedId] = draggedTile.getAttribute('src')
 
@@ -156,11 +166,12 @@ export default function CandyCrush() {
             setColorArrangement([...colorArrangement])
         }, 100)
         return () => clearInterval(timer)
-    }, [checkForVerticalMatches, checkForHorizontalMatches, removeTiles, clearTilesToRemove, moveDown, generateTiles, colorArrangement])
+    }, [checkForVerticalMatches, checkForHorizontalMatches, removeTiles, clearTilesToRemove, moveDown, generateTiles, colorArrangement, points])
 
 
     return (
         <GameContainer>
+            <h1 className="scoreboard">{points}</h1>
             <div className="candy-crush">
                 <div className="board">
                     {colorArrangement.map((tile, index) => (
