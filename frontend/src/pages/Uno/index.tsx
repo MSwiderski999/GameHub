@@ -1,4 +1,3 @@
-//#region imports
 import { ReactElement, useEffect, useState } from "react";
 import GameForm from "../../components/GameForm";
 import CardDisplay from "./CardDisplay";
@@ -17,10 +16,8 @@ import Infobox from "../../components/InfoBox";
 import { useAuth } from "../../helpers/checkAuth";
 import axios from "axios";
 import { isPlayable } from "./Functions/isPlayable";
-//#endregion
 
 export default function Uno(){
-    //#region hooks
     const auth = useAuth()
     const [username, setUsername] = useState<string>("Player")
 
@@ -45,14 +42,12 @@ export default function Uno(){
 
     const [infoMessage, setInfoMessage] = useState(<div>Good luck!</div>)
 
+    const delay = (ms: number | undefined) => new Promise(res => setTimeout(res, ms)) //delay for smooth animation
+
     useEffect(() => () => {
         setActive(false)
     }, [])
 
-    const delay = (ms: number | undefined) => new Promise(res => setTimeout(res, ms)) //delay for smooth animation
-    //#endregion
-
-    //#region get username function
     const handleUsername = () => {
         axios.defaults.withCredentials = true
         const url = "http://localhost:3000/accounts/" + auth
@@ -64,9 +59,7 @@ export default function Uno(){
             })
             .catch(err => console.log(err))
     }
-    //#endregion
 
-    //#region handle player's move
     const handlePlay = (id: number) => {
         const targetCard = game.players[0].hand.filter((card) => {
             return card.id === id
@@ -79,15 +72,11 @@ export default function Uno(){
             update_hand(0, game.players[0].hand)
         }
     }
-    //#endregion
 
-    //#region declaring game variables
     let action_index = Math.floor(Math.random() * 4)
     let game: Game
     let play: (hand: Card[], curr_card: Card) => number | null
-    //#endregion
 
-    //#region add card to hand
     const add_to_hand = (action_index: number, card: Card) => {
         switch(action_index){
             case 0:
@@ -108,9 +97,7 @@ export default function Uno(){
                 break
         }
     }
-    //#endregion
 
-    //#region update hand
     const update_hand = (action_index: number, hand: Card[]) => {
         switch(action_index % 4){
             case 0:
@@ -143,9 +130,7 @@ export default function Uno(){
                 break
         }
     }
-    //#endregion
 
-    //#region initiating game and play function
     const buildGame = () => {
         let temp_deck = shuffle(Deck)
         game = {
@@ -175,9 +160,7 @@ export default function Uno(){
             }
         }
     }
-    //#endregion
 
-    //#region distribute cards
     const distributeCards = async () => {
         for(let i = 0; i < 28; i++){
             const taken : Card = take(game.deck)
@@ -208,20 +191,17 @@ export default function Uno(){
             }
         }
     }
-    //#endregion
-    //#region bots play loop
+
     const botPlayLoop = () => {
         
     }
-    //#endregion
     
     const StartGame = async () =>{
         setActive(true)
 
-        //#region create a game object
+        //create a game object
         buildGame()
         buildPlayFunction()
-        //#endregion
 
         //distribute starting 7 cards
         await distributeCards()
@@ -231,7 +211,6 @@ export default function Uno(){
 
         //assign player's name to the game object
         game.players[0].name = username
-        //#region game loop
         
         while(game.players[action_index].hand.length > 0){
             let next_player = (action_index + game.turn_increment) % 4
@@ -268,7 +247,6 @@ export default function Uno(){
                     setCurrentCard({suit: played_card.suit, symbol: played_card.symbol, backside: false, id: played_card.id})
                 }
 
-                //#region end game if player wins
                 if(game.players[action_index].hand.length === 0){
 
                     setPlayerHand([])
@@ -298,7 +276,6 @@ export default function Uno(){
                     setInfoMessage(<div><span className="player-name">{game.players[action_index].name}</span><span className="keyword"> wins!</span></div>)
                     break
                 }
-                //#endregion
 
                 switch(played_card.symbol){
                     case '⊖':
@@ -342,7 +319,6 @@ export default function Uno(){
                 used_cards = []
             }
         }
-        //#endregion
     }
     return (
         active

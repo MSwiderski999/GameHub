@@ -24,12 +24,20 @@ const pick_suit = (hand: Card[]) => {
                 break
         }
     })
-    let highest = "blue"
-    if(blue < green)highest = "green"
-    if(green < red)highest = "red"
-    if(red < yellow)highest = "yellow"
-
-    return highest
+    let biggestSuit = "blue"
+    let highestSuitValue = blue
+    if (highestSuitValue < green) {
+        biggestSuit = "green"
+        highestSuitValue = green
+    }
+    if (highestSuitValue < red) {
+        biggestSuit = "red"
+        highestSuitValue = red
+    }
+    if (highestSuitValue < yellow) {
+        biggestSuit = "yellow"
+    }
+    return biggestSuit
 }
 
 const play_random = (hand: Card[], curr_card: Card) =>{
@@ -64,11 +72,9 @@ const play_random = (hand: Card[], curr_card: Card) =>{
     return selected_card.id
 }
 
-
-
 const play_optimal = (hand: Card[], curr_card: Card) =>{
     const playable_hand = hand.filter((card) => isPlayable(card, curr_card))
-    if(playable_hand.length == 0)return null //return null if no available cards
+    if(playable_hand.length == 0)return null
 
     let only_color_change = true
     playable_hand.forEach(card => {
