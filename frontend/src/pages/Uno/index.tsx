@@ -46,9 +46,20 @@ export default function Uno(){
 
     useEffect(() => () => {
         setActive(false)
+        setPlayerHand([])
+        setBot1Hand([])
+        setBot2Hand([])
+        setBot3Hand([])
     }, [])
 
-    const handleUsername = () => {
+    //declare array of already played cards
+    let used_cards : Card[] = []
+    let action_index = Math.floor(Math.random() * 4)
+    let game: Game
+    let play: (hand: Card[], curr_card: Card) => number | null
+    let actionOnPlayer : boolean = false
+
+    const getPlayerUsername = () => {
         axios.defaults.withCredentials = true
         const url = "http://localhost:3000/accounts/" + auth
         axios.post(url)
@@ -61,26 +72,156 @@ export default function Uno(){
     }
 
     const handlePlay = (id: number) => {
-        const targetCard = game.players[0].hand.filter((card) => {
-            return card.id === id
-        })[0]
-        if(isPlayable(targetCard, game.current_card)){
-            setCurrentCard({suit: targetCard.suit, symbol: targetCard.symbol, backside: false, id: targetCard.id})
-            game.players[0].hand = game.players[0].hand.filter((card) => {
-                return card.id !== targetCard.id
-            })
-            update_hand(0, game.players[0].hand)
+        if(actionOnPlayer == true){
+            const targetCard = game.players[0].hand.filter((card) => {
+                return card.id === id
+            })[0]
+            if(isPlayable(targetCard, game.current_card)){
+                setCurrentCard({suit: targetCard.suit, symbol: targetCard.symbol, backside: false, id: targetCard.id})
+                game.players[0].hand = game.players[0].hand.filter((card) => {
+                    return card.id !== targetCard.id
+                })
+                update_hand(0, game.players[0].hand)
+
+                actionOnPlayer = false
+                action_index = (action_index + game.turn_increment) % 4
+                handleBotPlay()
+            }
+        }
+        else{
+            console.log("Not your turn!")
         }
     }
 
-    let action_index = Math.floor(Math.random() * 4)
-    let game: Game
-    let play: (hand: Card[], curr_card: Card) => number | null
+    const handleDrawCardForPlayer = (game: Game) => {
+        let taken = take(game.deck)
+        game.players[0].hand.push(taken)
+        add_to_hand(0, taken)
+        sort_hand(game.players[0].hand)
+    }
+
+    const handleBotPlay = async () => {
+        while(action_index !== 0){
+            console.log(actionOnPlayer)
+            let next_player = (action_index + game.turn_increment) % 4
+
+            await delay(500)
+            setInfoMessage(<div><span className="player-name">{game.players[action_index].name}</span>'s turn!</div>)
+
+            //#region bot play
+            await delay(1000)
+            let played_card_id = play(game.players[action_index].hand, game.current_card)
+            if(played_card_id === null){//draw extra card
+                setInfoMessage(<div><span className="player-name">{game.players[action_index].name}</span> draws a card</div>)
+                await delay(1000)
+                let taken = take(game.deck)
+                game.players[action_index].hand.push(taken)
+                add_to_hand(action_index, taken)
+
+                played_card_id = play(game.players[action_index].hand, game.current_card)
+            }
+            if(played_card_id !== null){
+                setInfoMessage(<div><span className="player-name">{game.players[action_index].name}</span> plays a card</div>)
+                await delay(1000)
+                let played_card = game.players[action_index].hand.filter((card) => card.id === played_card_id)[0]
+                game.players[action_index].hand = game.players[action_index].hand.filter((card) => card.id !== played_card_id)
+
+                //update current card and hand
+                used_cards.push(played_card)
+                game.current_card = played_card
+                setCurrentCard({suit: played_card.suit, symbol: played_card.symbol, backside: false, id: played_card.id})
+                update_hand(action_index, game.players[action_index].hand)
+
+                //change color
+                if(played_card.suit === "changeColor"){
+                    await delay(1000)
+                    played_card.suit = pick_suit(game.players[action_index].hand)
+                    setCurrentCard({suit: played_card.suit, symbol: played_card.symbol, backside: false, id: played_card.id})
+                }
+
+                if(game.players[action_index].hand.length === 0){
+
+                    setPlayerHand([])
+                    game.players[0].hand.forEach(card => {
+                    setPlayerHand(playerHand => [...playerHand, <div className="card-container">
+                    <CardDisplay suit={card.suit} symbol={card.symbol} facing="down" id={card.id}/></div>])
+                    })
+
+                    setBot1Hand([])
+                    game.players[1].hand.forEach(card => {
+                    setBot1Hand(bot1Hand => [...bot1Hand, <div className="card-container">
+                    <CardDisplay suit={card.suit} symbol={card.symbol} facing="left" id={card.id}/></div>])
+                    })
+
+                    setBot2Hand([])
+                    game.players[2].hand.forEach(card => {
+                    setBot2Hand(bot2Hand => [...bot2Hand, <div className="card-container">
+                    <CardDisplay suit={card.suit} symbol={card.symbol} facing="left" id={card.id}/></div>])
+                    })
+
+                    setBot3Hand([])
+                    game.players[3].hand.forEach(card => {
+                    setBot3Hand(bot3Hand => [...bot3Hand, <div className="card-container">
+                    <CardDisplay suit={card.suit} symbol={card.symbol} facing="left" id={card.id}/></div>])
+                    })
+
+                    setInfoMessage(<div><span className="player-name">{game.players[action_index].name}</span><span className="keyword"> wins!</span></div>)
+                    break
+                }
+
+                switch(played_card.symbol){
+                    case '⊖':
+                        setInfoMessage(<div><span className="player-name">{game.players[next_player].name}</span><span className="danger"> skips a turn!</span></div>)
+                        action_index += game.turn_increment
+                        break
+                    case '❏':
+                        setInfoMessage(<div><span className="player-name">{game.players[next_player].name}</span><span className="danger"> draws 2 cards!</span></div>)
+                        for(let i = 0; i < 2; i++){
+                            let taken = take(game.deck)
+                            await delay(500)
+                            game.players[next_player].hand.push(taken)
+                            if(next_player === 0)sort_hand(game.players[0].hand)
+                            update_hand(next_player, game.players[next_player].hand)
+                        }
+                        action_index += game.turn_increment
+                        break
+                    case '🗇':
+                        setInfoMessage(<div><span className="player-name">{game.players[next_player].name}</span><span className="danger"> draws 4 cards!</span></div>)
+                        for(let i = 0; i < 4; i++){
+                            let taken = take(game.deck)
+                            await delay(500)
+                            game.players[next_player].hand.push(taken)
+                            if(next_player === 0)sort_hand(game.players[0].hand)
+                            update_hand(next_player, game.players[next_player].hand)
+                        }
+                        action_index += game.turn_increment
+                        break
+                    case '⥂':
+                        setInfoMessage(<div><span className="keyword">Direction</span><span> changed!</span></div>)
+                        await delay(1000)
+                        game.turn_increment = game.turn_increment === 1 ? 3 : 1
+                        break
+                }
+            }
+            action_index = (action_index + game.turn_increment) % 4
+            //#endregion
+
+            //refill deck
+            if(game.deck.length <= 4){
+                game.deck.concat(shuffle(used_cards))
+                used_cards = []
+            }
+        }
+        await delay(500)
+        setInfoMessage(<div><span className="player-name">{game.players[action_index].name}</span>'s turn!</div>)
+        actionOnPlayer = true
+        console.log("Now it should change: " + actionOnPlayer)
+    }
 
     const add_to_hand = (action_index: number, card: Card) => {
         switch(action_index){
             case 0:
-                setPlayerHand(playerHand => [...playerHand, <div className="card-container">
+                setPlayerHand(playerHand => [...playerHand, <div className="card-container" onClick={() => handlePlay(card.id)}>
                     <CardDisplay suit={card.suit} symbol={card.symbol} facing="down" id={card.id}/></div>])
                 break
             case 1:
@@ -191,10 +332,6 @@ export default function Uno(){
             }
         }
     }
-
-    const botPlayLoop = () => {
-        
-    }
     
     const StartGame = async () =>{
         setActive(true)
@@ -206,119 +343,10 @@ export default function Uno(){
         //distribute starting 7 cards
         await distributeCards()
 
-        //declare array of already played cards
-        let used_cards : Card[] = []
-
         //assign player's name to the game object
         game.players[0].name = username
         
-        while(game.players[action_index].hand.length > 0){
-            let next_player = (action_index + game.turn_increment) % 4
-
-            await delay(500)
-            setInfoMessage(<div><span className="player-name">{game.players[action_index].name}</span>'s turn!</div>)
-            await delay(1000)
-            let played_card_id = play(game.players[action_index].hand, game.current_card)
-            if(played_card_id === null){//draw extra card
-                setInfoMessage(<div><span className="player-name">{game.players[action_index].name}</span> draws a card</div>)
-                await delay(1000)
-                let taken = take(game.deck)
-                game.players[action_index].hand.push(taken)
-                add_to_hand(action_index, taken)
-
-                played_card_id = play(game.players[action_index].hand, game.current_card)
-            }
-            if(played_card_id !== null){
-                setInfoMessage(<div><span className="player-name">{game.players[action_index].name}</span> plays a card</div>)
-                await delay(1000)
-                let played_card = game.players[action_index].hand.filter((card) => card.id === played_card_id)[0]
-                game.players[action_index].hand = game.players[action_index].hand.filter((card) => card.id !== played_card_id)
-
-                //update current card and hand
-                used_cards.push(played_card)
-                game.current_card = played_card
-                setCurrentCard({suit: played_card.suit, symbol: played_card.symbol, backside: false, id: played_card.id})
-                update_hand(action_index, game.players[action_index].hand)
-
-                //change color
-                if(played_card.suit === "changeColor"){
-                    await delay(1000)
-                    played_card.suit = pick_suit(game.players[action_index].hand)
-                    setCurrentCard({suit: played_card.suit, symbol: played_card.symbol, backside: false, id: played_card.id})
-                }
-
-                if(game.players[action_index].hand.length === 0){
-
-                    setPlayerHand([])
-                    game.players[0].hand.forEach(card => {
-                    setPlayerHand(playerHand => [...playerHand, <div className="card-container">
-                    <CardDisplay suit={card.suit} symbol={card.symbol} facing="down" id={card.id}/></div>])
-                    })
-
-                    setBot1Hand([])
-                    game.players[1].hand.forEach(card => {
-                    setBot1Hand(bot1Hand => [...bot1Hand, <div className="card-container">
-                    <CardDisplay suit={card.suit} symbol={card.symbol} facing="left" id={card.id}/></div>])
-                    })
-
-                    setBot2Hand([])
-                    game.players[2].hand.forEach(card => {
-                    setBot2Hand(bot2Hand => [...bot2Hand, <div className="card-container">
-                    <CardDisplay suit={card.suit} symbol={card.symbol} facing="left" id={card.id}/></div>])
-                    })
-
-                    setBot3Hand([])
-                    game.players[3].hand.forEach(card => {
-                    setBot3Hand(bot3Hand => [...bot3Hand, <div className="card-container">
-                    <CardDisplay suit={card.suit} symbol={card.symbol} facing="left" id={card.id}/></div>])
-                    })
-
-                    setInfoMessage(<div><span className="player-name">{game.players[action_index].name}</span><span className="keyword"> wins!</span></div>)
-                    break
-                }
-
-                switch(played_card.symbol){
-                    case '⊖':
-                        setInfoMessage(<div><span className="player-name">{game.players[next_player].name}</span><span className="danger"> skips a turn!</span></div>)
-                        action_index += game.turn_increment
-                        break
-                    case '❏':
-                        setInfoMessage(<div><span className="player-name">{game.players[next_player].name}</span><span className="danger"> draws 2 cards!</span></div>)
-                        for(let i = 0; i < 2; i++){
-                            let taken = take(game.deck)
-                            await delay(500)
-                            game.players[next_player].hand.push(taken)
-                            if(next_player === 0)sort_hand(game.players[0].hand)
-                            update_hand(next_player, game.players[next_player].hand)
-                        }
-                        action_index += game.turn_increment
-                        break
-                    case '🗇':
-                        setInfoMessage(<div><span className="player-name">{game.players[next_player].name}</span><span className="danger"> draws 4 cards!</span></div>)
-                        for(let i = 0; i < 4; i++){
-                            let taken = take(game.deck)
-                            await delay(500)
-                            game.players[next_player].hand.push(taken)
-                            if(next_player === 0)sort_hand(game.players[0].hand)
-                            update_hand(next_player, game.players[next_player].hand)
-                        }
-                        action_index += game.turn_increment
-                        break
-                    case '⥂':
-                        setInfoMessage(<div><span className="keyword">Direction</span><span> changed!</span></div>)
-                        await delay(1000)
-                        game.turn_increment = game.turn_increment === 1 ? 3 : 1
-                        break
-                }
-            }
-            action_index = (action_index + game.turn_increment) % 4
-
-            //refill deck
-            if(game.deck.length <= 4){
-                game.deck.concat(shuffle(used_cards))
-                used_cards = []
-            }
-        }
+        handleBotPlay()
     }
     return (
         active
@@ -342,7 +370,7 @@ export default function Uno(){
 
             <div id="center-cards">
                 <CardDisplay symbol={current_card.symbol} suit={current_card.suit} backSide={current_card.backside} facing="down" id={current_card.id}/>
-                <div id="deck"><CardDisplay symbol={""} suit={""} backSide facing="down" id={current_card.id}/></div>
+                <div id="deck" onClick={() => handleDrawCardForPlayer(game)}><CardDisplay symbol={""} suit={""} backSide facing="down" id={current_card.id}/></div>
             </div>
 
             <Infobox>{infoMessage}</Infobox>
@@ -350,7 +378,7 @@ export default function Uno(){
         :
         <GameForm onSubmit={async () => {
             StartGame()
-            handleUsername()
+            getPlayerUsername()
         }}>
             <>
             <p className="input-label">Difficulty</p>
