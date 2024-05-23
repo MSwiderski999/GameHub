@@ -16,6 +16,7 @@ import Infobox from "../../components/InfoBox";
 import { useAuth } from "../../helpers/checkAuth";
 import axios from "axios";
 import { isPlayable } from "./Functions/isPlayable";
+import ColorChangeUI from "./ColorChangeUI";
 
 export default function Uno(){
     const auth = useAuth()
@@ -41,6 +42,7 @@ export default function Uno(){
     const [bot3Hand, setBot3Hand] = useState(new Array<ReactElement>)
 
     const [infoMessage, setInfoMessage] = useState(<div>Good luck!</div>)
+    const [colorSelectionUI, setColorSelectionUI] = useState<ReactElement | null>(null)
 
     const delay = (ms: number | undefined) => new Promise(res => setTimeout(res, ms)) //delay for smooth animation
 
@@ -71,26 +73,78 @@ export default function Uno(){
             .catch(err => console.log(err))
     }
 
-    const handlePlay = (id: number) => {
+    const handleCheckChangeColor = (id: number) => {
         if(actionOnPlayer == true){
             const targetCard = game.players[0].hand.filter((card) => {
                 return card.id === id
             })[0]
-            if(isPlayable(targetCard, game.current_card)){
-                setCurrentCard({suit: targetCard.suit, symbol: targetCard.symbol, backside: false, id: targetCard.id})
-                game.players[0].hand = game.players[0].hand.filter((card) => {
-                    return card.id !== targetCard.id
-                })
-                update_hand(0, game.players[0].hand)
 
-                actionOnPlayer = false
-                action_index = (action_index + game.turn_increment) % 4
-                handleBotPlay()
+            if(isPlayable(targetCard, game.current_card)){
+                if(targetCard.suit === "changeColor"){
+                    setColorSelectionUI(<ColorChangeUI targetCardID={id} nextFunction={handlePlay}/>)
+                }
+                else{
+                    handlePlay(id, null)
+                }
             }
         }
-        else{
-            console.log("Not your turn!")
+    }
+
+    const handlePlay = async (id: number, selectedColor: string | null) => {
+        setColorSelectionUI(null)
+        const targetCard = game.players[0].hand.filter((card) => {
+            return card.id === id
+        })[0]
+        
+        setCurrentCard({suit: targetCard.suit, symbol: targetCard.symbol, backside: false, id: targetCard.id})
+        game.players[0].hand = game.players[0].hand.filter((card) => {
+            return card.id !== targetCard.id
+        })
+        update_hand(0, game.players[0].hand)
+
+        if(targetCard.suit === "changeColor" && selectedColor != null){
+                targetCard.suit = selectedColor
+                setCurrentCard({suit: targetCard.suit, symbol: targetCard.symbol, backside: false, id: targetCard.id})
+            }
+
+        let next_player = (action_index + game.turn_increment) % 4
+        switch(targetCard.symbol){
+            case '⊖':
+                setInfoMessage(<div><span className="player-name">{game.players[next_player].name}</span><span className="danger"> skips a turn!</span></div>)
+                action_index += game.turn_increment
+                break
+            case '❏':
+                setInfoMessage(<div><span className="player-name">{game.players[next_player].name}</span><span className="danger"> draws 2 cards!</span></div>)
+                for(let i = 0; i < 2; i++){
+                    let taken = take(game.deck)
+                    await delay(500)
+                    game.players[next_player].hand.push(taken)
+                    if(next_player === 0)sort_hand(game.players[0].hand)
+                    update_hand(next_player, game.players[next_player].hand)
+                }
+                action_index += game.turn_increment
+                break
+            case '🗇':
+                setInfoMessage(<div><span className="player-name">{game.players[next_player].name}</span><span className="danger"> draws 4 cards!</span></div>)
+                for(let i = 0; i < 4; i++){
+                    let taken = take(game.deck)
+                    await delay(500)
+                    game.players[next_player].hand.push(taken)
+                    if(next_player === 0)sort_hand(game.players[0].hand)
+                    update_hand(next_player, game.players[next_player].hand)
+                }
+                action_index += game.turn_increment
+                break
+            case '⥂':
+                setInfoMessage(<div><span className="keyword">Direction</span><span> changed!</span></div>)
+                await delay(1000)
+                game.turn_increment = game.turn_increment === 1 ? 3 : 1
+                break
         }
+
+        actionOnPlayer = false
+        action_index = (action_index + game.turn_increment) % 4
+        handleBotPlay()
     }
 
     const handleDrawCardForPlayer = (game: Game) => {
@@ -221,7 +275,7 @@ export default function Uno(){
     const add_to_hand = (action_index: number, card: Card) => {
         switch(action_index){
             case 0:
-                setPlayerHand(playerHand => [...playerHand, <div className="card-container" onClick={() => handlePlay(card.id)}>
+                setPlayerHand(playerHand => [...playerHand, <div className="card-container" onClick={() => handleCheckChangeColor(card.id)}>
                     <CardDisplay suit={card.suit} symbol={card.symbol} facing="down" id={card.id}/></div>])
                 break
             case 1:
@@ -244,7 +298,7 @@ export default function Uno(){
             case 0:
                 setPlayerHand([])
                 hand.forEach(card => {
-                    setPlayerHand(playerHand => [...playerHand, <div className="card-container" onClick={() => handlePlay(card.id)}>
+                    setPlayerHand(playerHand => [...playerHand, <div className="card-container" onClick={() => handleCheckChangeColor(card.id)}>
                     <CardDisplay suit={card.suit} symbol={card.symbol} facing="down" id={card.id}/></div>])
                 })
                 break
@@ -374,6 +428,7 @@ export default function Uno(){
             </div>
 
             <Infobox>{infoMessage}</Infobox>
+            {colorSelectionUI}
         </GameContainer>
         :
         <GameForm onSubmit={async () => {

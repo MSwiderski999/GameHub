@@ -54,3 +54,41 @@
     transform: scale(110%);
     cursor: pointer;
 }
+
+.con{
+    width: 64px;
+    height: 64px;
+    border-radius: 5px;
+    background-color: black;
+
+    padding: 4px;
+    
+    display: grid;
+    grid-template-columns: auto auto;
+    grid-gap: 4px;
+
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.b{
+    background-color: blue;
+}
+.g{
+    background-color: green;
+}
+.r{
+    background-color: red;
+}
+.y{
+    background-color: yellow;
+}
+
+.choice{
+    cursor: pointer;
+    transition: 200ms all;
+}
+.choice:hover{
+    transform: scale(1.1);
+}
