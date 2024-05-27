@@ -92,3 +92,14 @@
 .choice:hover{
     transform: scale(1.1);
 }
+
+#drawn-card > *{
+    width: 91px;
+    height: 147px;
+}
+
+#drawn-card{
+    position: absolute;
+    top: 230px;
+    left: 300px;
+}

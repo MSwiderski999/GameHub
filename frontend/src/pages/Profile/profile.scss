@@ -1,0 +1,40 @@
+#profile-container{
+    width: 400px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    background-color: white;
+    border-radius: 10px;
+
+    padding: 10px;
+}
+
+#username-header{
+    width: 400px;
+    height: 50px;
+
+    font-weight: bold;
+    font-size: 30px;
+    text-align: center;
+
+    background-color: #fff;
+}
+
+#stats-section{
+    font-size: 20px;
+}
+
+#delete-account{
+    color: red;
+    font-size: 20px;
+    font-weight: 700;
+    transition: all 500ms;
+    height: 30px;
+    line-height: 30px;
+}
+
+#delete-account:hover{
+    font-size: 26px;
+}

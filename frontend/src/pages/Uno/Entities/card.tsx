@@ -3,4 +3,5 @@ export interface Card{
     suit: string
     value: number
     id: number
+    backside?: boolean
 }

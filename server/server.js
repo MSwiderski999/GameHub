@@ -36,6 +36,33 @@ app.post('/accounts/:id', (req, res) => {
         }
     })
 })
+
+app.post('/profile/games-played-grouped/:id', (req, res) => {
+    const values =[req.params.id]
+    const sql = "SELECT COUNT(*) AS `Played`, name AS `Game` FROM gameplays gp JOIN games g ON g.id = gp.game_id WHERE gp.account_id = ? GROUP BY 2 ORDER BY 1 DESC"
+    db.query(sql, values, (err, data) => {
+        if(err){
+            res.json({Message: err.message})
+        }
+        else{
+            res.json({gamesPlayedGrouped: data})
+        }
+    })
+})
+
+app.post('/profile/games-played/:id', (req, res) => {
+    const values = [req.params.id]
+    const sql = "SELECT COUNT(*) AS `Played` FROM gameplays WHERE account_id = ?"
+    db.query(sql, values, (err, data) => {
+        if(err){
+            res.json({Message: err.message})
+        }
+        else{
+            res.json({gamesPlayed: data[0].Played})
+        }
+    })
+})
+
 app.get('/memory/leaderboard/time', (req, res) => {
     const sql = "SELECT SUBSTRING(score, 1, 2) AS minutes, SUBSTRING(score, 4, 2) AS seconds, username FROM gameplays g JOIN accounts a ON a.id = g.account_id WHERE g.game_id = 2 ORDER BY 1, 2 LIMIT 10"
     db.query(sql, (err, data) => {
