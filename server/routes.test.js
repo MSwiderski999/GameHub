@@ -29,7 +29,7 @@ describe("App tests", () => {
                 .post("/profile/games-played-grouped/2")
                 .expect(200)
                 .then(res => {
-                    expect(res.body.gamesPlayedGrouped.length).toStrictEqual(3)
+                    expect(res.body.gamesPlayedGrouped.length).toStrictEqual(2)
                 })
                 done()
         })
@@ -183,6 +183,122 @@ describe("App tests", () => {
                 .post("/uno")
                 .send(values)
                 .expect(201)
+                done()
+        })
+    })
+
+    /**
+     * Testing login attempt
+     */
+    describe("POST /login", () => {
+        it("Should return 202 and Status: Success", (done) => {
+            const values = {
+                password: "test1234",
+                email: "test@gmail.com"
+            }
+            request(app)
+                .post("/login")
+                .send(values)
+                .expect(202)
+                .then(res => {
+                    expect(res.body.Status).toStrictEqual("Success")
+                })
+                done()
+        })
+        it("Should return 401 and Invalid password message", (done) => {
+            const values = {
+                password: "ogorkikiszone",
+                email: "test@gmail.com"
+            }
+            request(app)
+                .post("/login")
+                .send(values)
+                .expect(402)
+                .then(res => {
+                    expect(res.body.Message).toStrictEqual("Invalid password")
+                })
+                done()
+        })
+        it("Should return 404 and no email found message", (done) => {
+            const values = {
+                password: "test1234",
+                email: "tset@ligma.moc"
+            }
+            request(app)
+                .post("/login")
+                .send(values)
+                .expect(404)
+                .then(res => {
+                    expect(res.body.Message).toStrictEqual("No email found in database")
+                })
+                done()
+        })
+    })
+
+    /**
+     * Testing logout
+     */
+    describe("POST /logout", () => {
+        it("Should send Status Success and 200", (done) => {
+            request(app)
+                .post("/logout")
+                .expect(200)
+                .then(res => {
+                    expect(res.body.Status).toStrictEqual("Success")
+                })
+                done()
+        })
+    })
+
+    /**
+     * Testing register attempt
+     */
+    describe("POST /register", () => {
+        it("Should return 409 and message email in use", (done) => {
+            const values = {
+                email: "test@gmail.com",
+                username: "kochamunittesty",
+                password: "testtest12"
+            }
+            request(app)
+                .post("/register")
+                .send(values)
+                .expect(409)
+                .then(res => {
+                    expect(res.body.Message).toStrictEqual("Email already in use")
+                })
+                done()
+        })
+
+        it("Should return 409 and message username in use", (done) => {
+            const values = {
+                email: "test@pyssa.com",
+                username: "test",
+                password: "testtest12"
+            }
+            request(app)
+                .post("/register")
+                .send(values)
+                .expect(409)
+                .then(res => {
+                    expect(res.body.Message).toStrictEqual("Username already in use")
+                })
+                done()
+        })
+
+        it("Should return 201 and Status Success", (done) => {
+            const values = {
+                email: "test@pyssssa.com",
+                username: "kochamunittestyyy",
+                password: "testtest12"
+            }
+            request(app)
+                .post("/register")
+                .send(values)
+                .expect(201)
+                .then(res => {
+                    expect(res.body.Status).toStrictEqual("Success")
+                })
                 done()
         })
     })

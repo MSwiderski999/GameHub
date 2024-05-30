@@ -33,6 +33,9 @@ app.post('/accounts/:id', (req, res) => {
             res.status(200)
             res.send(data[0].username)
         }
+        else{
+            res.status(404).send()
+        }
     })
 })
 
@@ -143,23 +146,23 @@ app.post('/login', (req, res) => {
     const sql = "SELECT * FROM accounts WHERE email = ?"
     db.query(sql, [req.body.email], (err, data) => {
         if (err){
-            return res.json({Message: err.message})
+            return res.status(500).json({Message: err.message})
         }
         if (data.length > 0) {
             bcrypt.compare(req.body.password.toString(), data[0].password, (err, response) => {
                 if (err) {
-                    return res.json({Message: err.message})
+                    return res.status(500).json({Message: err.message})
                 }
                 if (response){
                     res.cookie('login_token', jwt.sign({id: data[0].id}, "jwt-secret-key"))
-                    return res.json({Status: "Success"})
+                    return res.status(202).json({Status: "Success"})
                 }
                 else {
-                    return res.json({Message: "Invalid password"})
+                    return res.status(401).json({Message: "Invalid password"})
                 }
             })
         }else {
-            return res.json({Message: "No email found in database"})
+            return res.status(404).json({Message: "No email found in database"})
         }
     })
 })
@@ -175,16 +178,16 @@ app.post('/register', (req, res) => {
     const registerSql = "INSERT INTO accounts (`username`, `email`, `password`)VALUES(?)"
 
     db.query(findEmailSql, req.body.email, (err, data) => {
-        if (err) return res.json({Message: err.message})
-        if (data.length > 0) return res.json({Message: "Email already in use"})
+        if (err) return res.status(500).json({Message: err.message})
+        if (data.length > 0) return res.status(409).json({Message: "Email already in use"})
     })
     db.query(findUsernameSql, req.body.username, (err, data) => {
-        if (err) return res.json({Message: err.message})
-        if (data.length > 0) return res.json({Message: "Username already in use"})
+        if (err) return res.status(500).json({Message: err.message})
+        if (data.length > 0) return res.status(409).json({Message: "Username already in use"})
     })
 
     bcrypt.hash(req.body.password.toString(), salt, (err, hash) => {
-        if (err) return res.json({Message: err.message})
+        if (err) return res.status(500).json({Message: err.message})
         const values = [
             req.body.username,
             req.body.email,
@@ -192,8 +195,8 @@ app.post('/register', (req, res) => {
         ]
 
         db.query(registerSql, [values], (err, result) => {
-            if (err) return res.json({Message: err.message})
-            return res.json({Status: "Success"})
+            if (err) return res.status(500).json({Message: err.message})
+            return res.status(201).json({Status: "Success"})
         })
     })
 })
