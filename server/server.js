@@ -126,6 +126,20 @@ app.post('/candy-crush', (req, res) => {
     })
 })
 
+app.post('/uno', (req, res) => {
+    const values = [
+        req.body.user,
+        "1",
+        req.body.score + "," + req.body.place + "," + req.body.mode
+    ]
+    const sql = `INSERT INTO gameplays(account_id, game_id, score) VALUES(?)`
+
+    db.query(sql, [values], (err) => {
+        if (err) res.status(500).json({Message: err})
+        else res.status(201).send()
+    })
+})
+
 app.post('/login', (req, res) => {
     const sql = "SELECT * FROM accounts WHERE email = ?"
     db.query(sql, [req.body.email], (err, data) => {
@@ -185,25 +199,6 @@ app.post('/register', (req, res) => {
     })
 })
 
-app.post('/change-name', (req, res) => {
-    const sql = "UPDATE accounts SET username = ? WHERE username = ?"
-    const oldUsername = req.body.oldUsername
-    const newUsername = req.body.newUsername
-    db.query(sql, [oldUsername, newUsername], (err) => {
-        if (err) return res.json({Message: err.message})
-        else return res.json({Status: "Success"})
-    })
-})
-
-app.post('/delete-account', (req, res) => {
-    const sql = "DELETE FROM accounts WHERE email = ?"
-    const email = req.body.email
-    db.query(sql, [email], (err) => {
-        if (err) return res.json({Message: err.message})
-        else return res.json({Status: "Success"})
-    })
-})
-  
 app.listen(port, () => {
     console.log(`App is listening on port ${port}.`)
 })
