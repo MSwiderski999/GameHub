@@ -167,4 +167,23 @@ describe("App tests", () => {
                 done()
         })
     })
+
+    /**
+     * Testing inserting uno score into gameplays 
+     */
+    describe("POST /uno", () => {
+        it("Should increase number of scores and return 201", (done) => {
+            const values = {
+                user: 2,
+                score: 0,
+                place: 0,
+                mode: "none"
+            }
+            request(app)
+                .post("/uno")
+                .send(values)
+                .expect(201)
+                done()
+        })
+    })
 })

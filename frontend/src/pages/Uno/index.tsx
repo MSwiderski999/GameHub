@@ -69,6 +69,7 @@ export default function Uno(){
 
     const [infoMessage, setInfoMessage] = useState(<div>Good luck!</div>)
     const [colorSelectionUI, setColorSelectionUI] = useState<ReactElement | null>(null)
+    const [gameOverMessage, setGameOverMessage] = useState<ReactElement | null>(null)
 
     const delay = (ms: number | undefined) => new Promise(res => setTimeout(res, ms)) //delay for smooth animation
 
@@ -97,7 +98,7 @@ export default function Uno(){
             })[0]
 
             if(isPlayable(targetCard, game.current_card)){
-                if(targetCard.suit === "changeColor"){
+                if(targetCard.value == 50){
                     setColorSelectionUI(<ColorChangeUI targetCardID={id} nextFunction={handlePlay}/>)
                 }
                 else{
@@ -116,7 +117,11 @@ export default function Uno(){
         setCurrentCard(targetCard)
         removeCardFromHand(0, targetCard.id)
 
-        if(targetCard.suit === "changeColor" && selectedColor != null){
+        if(game.players[0].hand.length === 0){
+            handleGameOver()
+        }
+
+        if(targetCard.value == 50 && selectedColor != null){
                 targetCard.suit = selectedColor
                 setCurrentCard(targetCard)
             }
@@ -208,8 +213,7 @@ export default function Uno(){
                 }
 
                 if(game.players[action_index].hand.length === 0){
-                    setInfoMessage(<div><span className="player-name">{game.players[action_index].name}</span><span className="keyword"> wins!</span></div>)
-                    revealCards()
+                    handleGameOver()
                     return
                 }
 
@@ -337,6 +341,59 @@ export default function Uno(){
         handleBotPlay()
     }
 
+    const calculateHandValue = (hand: Card[]) => {
+        let value = 0
+        hand.forEach(card => {
+            value += card.value
+        })
+        return value
+    }
+
+    const handleGameOver = () => {
+        let oldPoints: {player: string, handValue: number}[] = []
+        game.players.forEach(player => {
+            oldPoints.push({player: player.name, handValue: calculateHandValue(player.hand)})
+        })
+        oldPoints = oldPoints.sort(({handValue:a}, {handValue:b}) => a-b)
+
+        setGameOverMessage(
+        <div className="tinted">
+            <div className="game-over-message">
+                <h1>Game over!</h1>
+                <ol>
+                {oldPoints.map(score => <li>{score.player}: {score.handValue}</li>)}
+                </ol>
+                <button onClick={() => {window.location.reload()}}>Play again</button>
+            </div>
+        </div>)
+
+        let playerScore = 0
+        let playerPlace = 0
+        for(let i = 3; i >= 0; i--){
+            if(oldPoints[i].player !== "Player"){
+                playerScore += oldPoints[i].handValue
+            }
+            else{
+                playerPlace = i + 1
+                break
+            }
+        }
+        const values = {
+            user: auth,
+            mode: difficulty,
+            score: playerScore,
+            place: playerPlace
+        }
+        axios.defaults.withCredentials = true
+        axios.post('http://localhost:3000/uno', values)
+                .then(res => {
+                    if (res.data.status !== 201) {
+                        console.log(res.data.Message)
+                    }
+                })
+                .catch(err => console.log(err))
+    }
+
     useEffect(() => {
         if(game.players[0].hand != undefined){
             let old = game
@@ -372,6 +429,7 @@ export default function Uno(){
 
             <Infobox>{infoMessage}</Infobox>
             {colorSelectionUI}
+            {gameOverMessage}
 
         </GameContainer>
         :
@@ -385,13 +443,6 @@ export default function Uno(){
                 <div className={difficulty === "easy"? "multiple-choice multiple-choice-selected" : "multiple-choice"} onClick={()=>setDifficulty("easy")}>Easy</div>
                 <div className={difficulty === "medium"? "multiple-choice multiple-choice-selected" : "multiple-choice"} onClick={()=>setDifficulty("medium")}>Medium</div>
                 <div className={difficulty === "hard"? "multiple-choice multiple-choice-selected" : "multiple-choice"} onClick={()=>setDifficulty("hard")}>Hard</div>
-            </div>
-
-            <p className="input-label">Mode</p>
-            <div className="multiple-choice-container">
-                <div className={gamesTotal === 1? "multiple-choice multiple-choice-selected" : "multiple-choice"} onClick={()=>setGamesTotal(1)}>Single Game</div>
-                <div className={gamesTotal === 5? "multiple-choice multiple-choice-selected" : "multiple-choice"} onClick={()=>setGamesTotal(5)}>Best Of 5</div>
-                <div className={gamesTotal === 10? "multiple-choice multiple-choice-selected" : "multiple-choice"} onClick={()=>setGamesTotal(10)}>Best Of 10</div>
             </div>
             </>
         </GameForm>
