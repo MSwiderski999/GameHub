@@ -7,7 +7,7 @@ interface GameFormProps{
 }
 export default function GameForm(props: GameFormProps){
     return(
-        <div id="form-container">
+        <div id="form-container" role='form-container'>
         {props.children}
         <button onClick={props.onSubmit} id="submit">Play</button>
         </div>

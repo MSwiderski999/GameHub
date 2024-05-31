@@ -8,7 +8,7 @@ interface GameContainerProps{
 export default function GameContainer(props: GameContainerProps){
     return(
         <>
-        <div className="game-container">
+        <div className="game-container" role="game-container">
             {props.children}
         </div>
         </>

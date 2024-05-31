@@ -8,8 +8,8 @@ interface PlayerTagProps{
 
 export default function PlayerTag(props: PlayerTagProps){
     return(
-        <div id='player-tag' className={props.inAction ? "active" : ""}>
-        <img id='player-photo' src={props.photoSrc}/>
+        <div id='player-tag' className={props.inAction ? "active" : ""} role='tag'>
+        <img id='player-photo' src={props.photoSrc} alt='player-photo'/>
         <div id='player-name'>{props.playerName}</div>
         </div>
     )

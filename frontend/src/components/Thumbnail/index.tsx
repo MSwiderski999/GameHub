@@ -13,7 +13,7 @@ export default function Thumbnail(props: ThumbnailProps){
     return (
         <div className='thumbnail-container'>
             <h1>{props.name}</h1>
-            <div className='img-container'><img src={props.imgsrc}/></div>
+            <div className='img-container'><img src={props.imgsrc} alt={props.name}/></div>
             <div className='on-hover'>
                 <p>{props.description}</p>
                 <button className='play-button' onClick={() => { if(props.url)navigate(props.url)}}>Play</button>
